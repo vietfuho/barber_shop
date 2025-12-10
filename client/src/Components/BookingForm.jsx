@@ -1,14 +1,14 @@
 import { useState, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 
 export default function BookingForm() {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: "",
     phone: "",
     email: "",
     date: "",
     time: "",
-    service: "",
-    barber: "Ngẫu nhiên",
     note: "",
   });
 
@@ -46,7 +46,7 @@ export default function BookingForm() {
     e.preventDefault();
 
     try {
-      const token = localStorage.getItem("token"); // lấy token đã login
+      const token = localStorage.getItem("token");
       const res = await fetch("http://localhost:5000/api/bookings", {
         method: "POST",
         headers: {
@@ -58,8 +58,6 @@ export default function BookingForm() {
           phone: formData.phone,
           email: formData.email,
           date: formData.date + "T" + formData.time, // ghép ngày + giờ
-          serviceId: formData.service, // ID dịch vụ thực tế trong DB
-          staffId: formData.barber !== "Ngẫu nhiên" ? formData.barber : null,
           note: formData.note,
         }),
       });
@@ -67,7 +65,7 @@ export default function BookingForm() {
       const data = await res.json();
       if (res.ok) {
         alert("Đặt lịch thành công!");
-        console.log("Booking created:", data);
+        navigate("/"); // 🔥 quay về trang chủ
       } else {
         alert("Có lỗi: " + (data.error || "Không xác định"));
       }
@@ -140,32 +138,6 @@ export default function BookingForm() {
                 ))}
               </select>
             </div>
-
-            <select
-              name="service"
-              value={formData.service}
-              onChange={handleChange}
-              required
-              className="w-full border border-orange-300 rounded px-3 py-1.5 text-sm"
-            >
-              <option value="">Chọn dịch vụ *</option>
-              {/* Thực tế nên load từ API Service */}
-              <option value="656f...abc">Cắt tóc</option>
-              <option value="656f...def">Uốn tóc</option>
-              <option value="656f...ghi">Nhuộm tóc</option>
-            </select>
-
-            <select
-              name="barber"
-              value={formData.barber}
-              onChange={handleChange}
-              className="w-full border border-orange-300 rounded px-3 py-1.5 text-sm"
-            >
-              <option value="Ngẫu nhiên">Chọn thợ: Ngẫu nhiên</option>
-              {/* Thực tế nên load từ API User (role=staff) */}
-              <option value="656f...xyz">Thợ A</option>
-              <option value="656f...klm">Thợ B</option>
-            </select>
 
             <textarea
               name="note"

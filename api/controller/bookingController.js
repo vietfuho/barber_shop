@@ -1,20 +1,14 @@
 const Booking = require("../models/booking");
 
+// =======================
 // Tạo lịch hẹn
+// =======================
 exports.create = async (req, res) => {
   try {
-    const { fullName, phone, email, date, serviceId, staffId, note } = req.body;
+    const { fullName, phone, email, date, note } = req.body;
 
-    if (!fullName || !phone || !date || !serviceId) {
+    if (!fullName || !phone || !date) {
       return res.status(400).json({ error: "Thiếu thông tin bắt buộc" });
-    }
-
-    // Kiểm tra trùng lịch nếu có chọn thợ
-    if (staffId) {
-      const conflict = await Booking.findOne({ staffId, date, status: { $ne: "canceled" } });
-      if (conflict) {
-        return res.status(400).json({ error: "Thợ đã có lịch hẹn tại thời điểm này" });
-      }
     }
 
     const booking = await Booking.create({
@@ -22,9 +16,7 @@ exports.create = async (req, res) => {
       phone,
       email,
       date,
-      serviceId,
-      staffId,
-      note
+      note,
     });
 
     res.status(201).json(booking);
@@ -33,24 +25,24 @@ exports.create = async (req, res) => {
   }
 };
 
+// =======================
 // Lấy tất cả lịch hẹn
+// =======================
 exports.getAll = async (req, res) => {
   try {
-    const bookings = await Booking.find()
-      .populate("serviceId", "name price")
-      .populate("staffId", "username email");
+    const bookings = await Booking.find();
     res.json(bookings);
   } catch (err) {
     res.status(500).json({ error: "Lỗi lấy danh sách lịch hẹn" });
   }
 };
 
+// =======================
 // Lấy 1 lịch hẹn
+// =======================
 exports.getOne = async (req, res) => {
   try {
-    const booking = await Booking.findById(req.params.id)
-      .populate("serviceId", "name price")
-      .populate("staffId", "username email");
+    const booking = await Booking.findById(req.params.id);
 
     if (!booking) return res.status(404).json({ error: "Không tìm thấy lịch hẹn" });
     res.json(booking);
@@ -59,7 +51,9 @@ exports.getOne = async (req, res) => {
   }
 };
 
-// Cập nhật trạng thái lịch hẹn
+// =======================
+// Cập nhật lịch hẹn
+// =======================
 exports.update = async (req, res) => {
   try {
     const booking = await Booking.findByIdAndUpdate(req.params.id, req.body, { new: true });
@@ -70,17 +64,16 @@ exports.update = async (req, res) => {
   }
 };
 
-// Hủy lịch hẹn
+// =======================
+// Xóa lịch hẹn
+// =======================
 exports.remove = async (req, res) => {
   try {
-    const booking = await Booking.findById(req.params.id);
+    const booking = await Booking.findByIdAndDelete(req.params.id);
     if (!booking) return res.status(404).json({ error: "Không tìm thấy lịch hẹn" });
 
-    booking.status = "canceled";
-    await booking.save();
-
-    res.json({ message: "Hủy lịch hẹn thành công" });
+    res.json({ message: "Xóa lịch hẹn thành công" });
   } catch (err) {
-    res.status(500).json({ error: "Lỗi hủy lịch hẹn" });
+    res.status(500).json({ error: "Lỗi xóa lịch hẹn" });
   }
 };

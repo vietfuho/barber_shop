@@ -5,10 +5,7 @@ const bookingSchema = new mongoose.Schema({
   phone:    { type: String, required: true }, // Số điện thoại
   email:    { type: String },                 // Email (không bắt buộc)
   date:     { type: Date, required: true },   // Ngày đặt lịch
-  serviceId:{ type: mongoose.Schema.Types.ObjectId, ref: "Service", required: true }, // Dịch vụ
-  staffId:  { type: mongoose.Schema.Types.ObjectId, ref: "User" }, // Thợ (có thể ngẫu nhiên)
-  note:     { type: String },                 // Ghi chú thêm
-  status:   { type: String, enum: ["pending", "confirmed", "canceled"], default: "pending" }, // Trạng thái
+  note:     { type: String },                 // Ghi chú thêm cho họ biết 
   createdAt:{ type: Date, default: Date.now }
 });
 
