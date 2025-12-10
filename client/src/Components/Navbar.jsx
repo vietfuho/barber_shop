@@ -47,11 +47,48 @@ const Navbar = ({ isLoggedIn, setIsLoggedIn }) => {
                   <CgProfile size={28} className="text-orange-500" />
                 </button>
                 {openMenu && (
-                  <div className="absolute right-0 mt-2 w-40 bg-white border rounded shadow-md text-sm z-10">
-                    <NavLink to="/profile" className="block px-4 py-2 hover:bg-orange-50">Profile </NavLink>
-                    <NavLink to="/profile" className="block px-4 py-2 hover:bg-orange-50">Setting</NavLink>
-                    <button onClick={handleLogout} className="w-full text-left px-4 py-2 hover:bg-orange-50">
-                      <Link to="/login">Đăng xuất</Link>
+                  // <div className="absolute right-0 mt-2 w-40 bg-white border rounded shadow-md text-sm z-10">
+                  //   <NavLink to="/profile" className="block px-4 py-2 hover:bg-orange-50">Profile </NavLink>
+                  //   <NavLink to="/profile" className="block px-4 py-2 hover:bg-orange-50">Setting</NavLink>
+                  //   <button onClick={handleLogout} className="w-full text-left px-4 py-2 hover:bg-orange-50">
+                  //     <Link to="/login">Đăng xuất</Link>
+                  //   </button>
+                  // </div>
+                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-100 py-2 z-50 overflow-hidden">
+                    {/* Profile */}
+                    <NavLink
+                      to="/profile"
+                      className="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-orange-50 transition-colors"
+                    >
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                      </svg>
+                      <span className="font-medium">Hồ sơ</span>
+                    </NavLink>
+
+                    {/* Settings */}
+                    <NavLink
+                      to="/settings"
+                      className="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-orange-50 transition-colors"
+                    >
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 0M10.325 19.683c.426 1.756 2.924 1.756 3.35 0a1.724 1.724 0 002.573-1.066c1.543.94 3.31-.826 2.37 0M12 8a4 4 0 100 8 4 4 0 000-8z" />
+                      </svg>
+                      <span className="font-medium">Cài đặt</span>
+                    </NavLink>
+
+                    {/* Divider */}
+                    <div className="border-t border-gray-200 my-1"></div>
+
+                    {/* Logout */}
+                    <button
+                      onClick={handleLogout}
+                      className="flex items-center gap-3 w-full px-4 py-3 text-red-600 hover:bg-red-50 transition-colors font-medium"
+                    >
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0-4-4m0 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                      </svg>
+                      Đăng xuất
                     </button>
                   </div>
                 )}

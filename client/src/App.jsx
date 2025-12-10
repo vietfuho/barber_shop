@@ -13,6 +13,7 @@ import Shop from './pages/Shop';
 import LoginForm from './Components/LoginForm';
 import RegisterForm from './Components/RegisterForm';
 import Footer from './Components/Footer';
+import Profile from './pages/Profile';
 
 import DetailsServices from './pages/DetailsServices';
 import AdminFE from './routes/admin/AdminFE';
@@ -21,9 +22,10 @@ function App() {
   // ✅ trạng thái đăng nhập toàn cục
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
+
   return (
     <>
-    <AdminFE/>
+      <AdminFE />
       {/* Navbar nhận props để đổi giao diện */}
       <Navbar isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn} />
 
@@ -40,6 +42,7 @@ function App() {
           <Route path="/booking" element={<Booking />} />
           <Route path="/shop" element={<Shop />} />
           <Route path="/services/details" element={<DetailsServices />} />
+          <Route path="/profile" element={<Profile />} />
 
 
           {/* LoginForm gọi onLoginSuccess để cập nhật Navbar */}
@@ -52,7 +55,7 @@ function App() {
           <Route path="/register" element={<RegisterForm />} />
 
           {/* admin routes */}
-         
+
 
         </Routes>
 
