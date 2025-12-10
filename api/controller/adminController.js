@@ -1,4 +1,3 @@
-// controller/userController.js
-exports.dashboard = (req, res) => {
-  res.json({ message: "Thông tin user" });
+exports.Home = (req, res) => {
+  res.json({ message: "Trang chủ Admin" });
 };

@@ -13,10 +13,9 @@ import Shop from './pages/Shop';
 import LoginForm from './Components/LoginForm';
 import RegisterForm from './Components/RegisterForm';
 import Footer from './Components/Footer';
-import AdminServices from './pages/admin/AdminServices';
-import AddServices from './pages/admin/AddServices';
-import EditService from './pages/admin/EditServices';
+
 import DetailsServices from './pages/DetailsServices';
+import AdminFE from './routes/admin/AdminFE';
 
 function App() {
   // ✅ trạng thái đăng nhập toàn cục
@@ -24,6 +23,7 @@ function App() {
 
   return (
     <>
+    <AdminFE/>
       {/* Navbar nhận props để đổi giao diện */}
       <Navbar isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn} />
 
@@ -52,9 +52,7 @@ function App() {
           <Route path="/register" element={<RegisterForm />} />
 
           {/* admin routes */}
-          <Route path="/admin/services" element={<AdminServices />} />
-          <Route path="/admin/services/add" element={<AddServices />} />
-          <Route path="/admin/services/edit/:id" element={<EditService />} />
+         
 
         </Routes>
 

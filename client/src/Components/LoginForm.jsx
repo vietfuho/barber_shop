@@ -4,7 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 
 export default function LoginForm({ onLoginSuccess }) {
-  const [formData, setFormData] = useState({ email: "", password: "" });
+  const [formData, setFormData] = useState({ usernameOrEmail: "", password: "" });
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
@@ -18,20 +18,26 @@ export default function LoginForm({ onLoginSuccess }) {
     try {
       setLoading(true);
       const res = await axios.post("http://localhost:5000/api/auth/login", {
-        
-        usernameOrEmail: formData.email, // backend nhận email hoặc username
+        usernameOrEmail: formData.usernameOrEmail,
         password: formData.password,
       });
 
       console.log("Login response:", res.data);
 
-      // ✅ Lưu token vào localStorage (backend trả về field 'token')
+      // ✅ Lưu token và role
       localStorage.setItem("token", res.data.token);
+      localStorage.setItem("role", res.data.user.role);
 
       alert(res.data.message || "Đăng nhập thành công");
 
-      if (onLoginSuccess) onLoginSuccess(); // cập nhật Navbar
-      navigate("/");
+      if (onLoginSuccess) onLoginSuccess();
+
+      // ✅ Điều hướng theo role
+      if (res.data.user.role === "admin") {
+        navigate("admin");
+      } else {
+        navigate("/");
+      }
     } catch (err) {
       console.error("Login error:", err.response?.data);
       alert(err.response?.data?.error || "Lỗi đăng nhập");
@@ -53,10 +59,10 @@ export default function LoginForm({ onLoginSuccess }) {
 
           <form onSubmit={handleSubmit} className="space-y-4 text-sm">
             <input
-              type="email"
-              name="email"
+              type="text"
+              name="usernameOrEmail"
               placeholder="Email hoặc Username"
-              value={formData.email}
+              value={formData.usernameOrEmail}
               onChange={handleChange}
               required
               className="w-full border border-orange-300 rounded px-4 py-2"
@@ -83,10 +89,10 @@ export default function LoginForm({ onLoginSuccess }) {
             <div className="text-center text-xs text-gray-500 mt-4">
               Hoặc đăng nhập với
               <div className="flex justify-center gap-4 mt-2">
-                <button className="bg-white gap-1 flex items-center justify-center border px-3 py-1 rounded text-black text-sm">
+                <button type="button" className="bg-white gap-1 flex items-center justify-center border px-3 py-1 rounded text-black text-sm">
                   <FaGoogle /> Google
                 </button>
-                <button className="bg-white gap-1 flex items-center justify-center border px-3 py-1 rounded text-black text-sm">
+                <button type="button" className="bg-white gap-1 flex items-center justify-center border px-3 py-1 rounded text-black text-sm">
                   <FaFacebook className="text-blue-600" /> Facebook
                 </button>
               </div>
