@@ -1,0 +1,9 @@
+# Node modules
+node_modules/
+
+# Lock file bên trong node_modules (không cần commit)
+**/node_modules/.package-lock.json
+
+# Các file tạm khác (nếu có)
+npm-debug.log
+.env
