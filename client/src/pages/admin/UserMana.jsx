@@ -65,7 +65,7 @@ export default function UserMana() {
       </h2>
 
       {/* Thanh tìm kiếm */}
-      <div className="flex justify-between items-center mb-4">
+      <div className="flex gap-3 items-center mb-4">
         <input
           type="text"
           placeholder="Tìm kiếm theo tên, email, số điện thoại..."
@@ -73,6 +73,12 @@ export default function UserMana() {
           onChange={(e) => setSearchTerm(e.target.value)}
           className="border border-gray-300 p-2 rounded w-64 focus:ring-2 focus:ring-orange-400"
         />
+        <button
+          onClick={() => setSearchTerm("")}
+          className="bg-green-600 text-white px-3 py-2 rounded"
+        >
+          Phê Duyệt
+        </button>
         <button
           onClick={() => setSearchTerm("")}
           className="bg-gray-300 text-gray-700 px-3 py-2 rounded hover:bg-gray-400"

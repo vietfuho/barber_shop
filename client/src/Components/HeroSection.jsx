@@ -18,7 +18,7 @@ export default function HeroSection() {
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 w-full">
         <div className="max-w-3xl text-white">
           <div className="inline-block px-4 py-2 bg-amber-500/20 border border-amber-500 rounded-full mb-6">
-            <span className="text-amber-500">Premium Barbershop</span>
+            <Link to="premium" className="text-amber-500">Premium Barbershop</Link>
           </div>
 
           <h1 className="text-5xl md:text-7xl mb-6">

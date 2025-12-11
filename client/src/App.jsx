@@ -9,7 +9,7 @@ import About from "./pages/About";
 import Team from "./pages/Team";
 import ServicesPrice from "./pages/Services&Pricing";
 import Gallery from "./pages/Gallery";
-import Blog from "./pages/Blog";
+
 import Contact from "./pages/Contact";
 import Booking from "./pages/Booking";
 import Shop from "./pages/Shop";
@@ -20,6 +20,8 @@ import AdminFE from "./routes/admin/AdminFE";
 import DetailsFe from "./pages/DetailsFE";
 import MyBookings from "./pages/MyBookings";
 import Profile from "./pages/Profile";
+import Premium from "./Components/Premium";
+import RegisterStaff from "./Components/button/RegisterStaff";
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -42,12 +44,14 @@ function App() {
           <Route path="/services" element={<ServicesPrice />} />
           <Route path="/gallery" element={<Gallery />} />
           <Route path="/team" element={<Team />} />
-          <Route path="/blog" element={<Blog />} />
+          
           <Route path="/contact" element={<Contact />} />
           <Route path="/booking" element={<Booking />} />
           <Route path="/shop" element={<Shop />} />
           <Route path="/services/details/:id" element={<DetailsFe />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="/premium" element={<Premium />} />
+          <Route path="/registerStaff" element={<RegisterStaff />} />
 
           {/* Auth routes */}
           <Route

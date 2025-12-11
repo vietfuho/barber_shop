@@ -32,6 +32,7 @@ export default function LoginForm({ onLoginSuccess }) {
       // === Lưu token + role để giữ đăng nhập sau reload ===
       localStorage.setItem("token", res.data.token);
       localStorage.setItem("role", res.data.user.role);
+      localStorage.setItem("username", res.data.user._id);
 
       // === Báo đăng nhập thành công ===
       alert(res.data.message || "Đăng nhập thành công!");

@@ -31,7 +31,7 @@ const Navbar = ({ isLoggedIn, setIsLoggedIn }) => {
             <NavLink to="/services" className={({ isActive }) => isActive ? "text-orange-500" : "text-white hover:text-orange-500"}>Dịch vụ</NavLink>
             <NavLink to="/gallery" className={({ isActive }) => isActive ? "text-orange-500" : "text-white hover:text-orange-500"}>Thư viện</NavLink>
             <NavLink to="/team" className={({ isActive }) => isActive ? "text-orange-500" : "text-white hover:text-orange-500"}>Đội ngũ</NavLink>
-            <NavLink to="/blog" className={({ isActive }) => isActive ? "text-orange-500" : "text-white hover:text-orange-500"}>Tin tức</NavLink>
+            <NavLink to="/registerStaff" className={({ isActive }) => isActive ? "text-orange-500" : "text-white hover:text-orange-500"}>Trở thành thợ</NavLink>
           </nav>
 
           {/* Right side */}
@@ -55,7 +55,7 @@ const Navbar = ({ isLoggedIn, setIsLoggedIn }) => {
                   //     <Link to="/login">Đăng xuất</Link>
                   //   </button>
                   // </div>
-                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-100 py-2 z-50 overflow-hidden">
+                  <div className="absolute right-[-10px] top-[40px] mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-100 py-2 z-50 overflow-hidden">
                     {/* Profile */}
                     <NavLink
                       to="/profile"

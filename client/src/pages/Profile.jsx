@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+
 
 const Profile = () => {
     const [user, setUser] = useState(null);    // chứa thông tin user
@@ -15,7 +15,7 @@ const Profile = () => {
                     return;
                 }
 
-                const res = await fetch("http://localhost:5000/api/users/me", {
+                const res = await fetch(`http://localhost:5000/api/users`, {
                     method: "GET",
                     headers: {
                         "Content-Type": "application/json",

@@ -3,16 +3,38 @@ import axios from "axios";
 
 export default function MyBookings() {
   const [bookings, setBookings] = useState([]);
+  const [loading, setLoading] = useState(true);
   const token = localStorage.getItem("token");
 
   useEffect(() => {
-    axios
-      .get("http://localhost:5000/api/bookings/my", {
+  const fetchBookings = async () => {
+    if (!token) {
+      setLoading(false); 
+      return;
+    }
+
+    try {
+      const res = await axios.get("http://localhost:5000/api/bookings/my", {
         headers: { Authorization: `Bearer ${token}` },
-      })
-      .then((res) => setBookings(res.data))
-      .catch((err) => console.error("Lỗi lấy lịch hẹn của bạn:", err));
-  }, [token]);
+      });
+      setBookings(res.data);
+    } catch (err) {
+      console.error("Lỗi lấy lịch hẹn:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  fetchBookings();
+}, [token]);
+
+
+  // --- UI ---
+  if (loading) {
+    return (
+      <div className="p-6 text-center text-gray-600">Đang tải dữ liệu...</div>
+    );
+  }
 
   return (
     <div className="p-6">
@@ -34,11 +56,15 @@ export default function MyBookings() {
           </thead>
           <tbody>
             {bookings.map((b, index) => (
-              <tr key={b._id}>
-                <td>{index + 1}</td>
-                <td>{new Date(b.date).toLocaleString()}</td>
-                <td>{b.note || "-"}</td>
-                <td>{new Date(b.createdAt).toLocaleString()}</td>
+              <tr key={b._id} className="text-center">
+                <td className="px-4 py-2">{index + 1}</td>
+                <td className="px-4 py-2">
+                  {b.date ? new Date(b.date).toLocaleString() : "-"}
+                </td>
+                <td className="px-4 py-2">{b.note || "Không có"}</td>
+                <td className="px-4 py-2">
+                  {b.createdAt ? new Date(b.createdAt).toLocaleString() : "-"}
+                </td>
               </tr>
             ))}
           </tbody>

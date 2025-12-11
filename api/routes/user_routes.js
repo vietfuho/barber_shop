@@ -8,7 +8,7 @@ const checkRole = require("../middleware/checkRole");
 router.post("/", userController.create);
 
 // Chỉ admin/staff mới xem danh sách
-router.get("/", verifyToken, checkRole(["admin","staff"]), userController.getAll);
+router.get("/", verifyToken, checkRole(["admin","member","staff"]), userController.getAll);
 
 // Chỉ user đã đăng nhập mới xem chi tiết
 router.get("/:id", verifyToken, userController.getOne);

@@ -74,7 +74,7 @@ export default function BookingForm() {
           time: "",
           note: "",
         });
-        navigate("/"); // 🔥 quay về trang chủ
+        navigate("/mybookings"); // 🔥 quay về trang chủ
       } else {
         alert("Có lỗi: " + (data.error || "Không xác định"));
       }

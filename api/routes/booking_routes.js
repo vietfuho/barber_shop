@@ -20,5 +20,5 @@ router.put("/:id",verifyToken, checkRole("member"), bookingController.update);
 router.delete("/:id",verifyToken, checkRole("member"), bookingController.remove);
 
 // Lấy lịch hẹn của chính mình
-router.get("/my", verifyToken, checkRole("member"), bookingController.getMyBookings);
+router.get("/my/:id", verifyToken, bookingController.getMyBookingById);
 module.exports = router;

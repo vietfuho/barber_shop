@@ -3,6 +3,6 @@ const router = express.Router();
 const checkRole = require("../middleware/checkRole");
 const adminController = require("../controller/adminController");
 const verifyToken = require("../middleware/verifyToken");
-router.get("/",  verifyToken, checkRole("admin"), adminController.Home);
+router.get("/approve",  verifyToken, checkRole("admin"), adminController.approveRequest);
 
 module.exports = router;
