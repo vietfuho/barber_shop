@@ -1,63 +1,126 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+
+// Import Recharts
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  CartesianGrid,
+  ResponsiveContainer,
+} from "recharts";
 
 const Dashboard = () => {
+  const [stats, setStats] = useState({
+    users: 0,
+    services: 0,
+    bookings: 0,
+    revenue: 0,
+    recentBookings: [],
+  });
+
+  const token = localStorage.getItem("token");
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        // Lấy users
+        const usersRes = await axios.get("http://localhost:5000/api/users", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        // Lấy services
+        const servicesRes = await axios.get("http://localhost:5000/api/services");
+
+        // Lấy bookings
+        const bookingsRes = await axios.get("http://localhost:5000/api/bookings", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        const usersCount = usersRes.data.length;
+        const servicesCount = servicesRes.data.length;
+        const bookingsCount = bookingsRes.data.length;
+
+        // Tính doanh thu
+        const revenue = bookingsRes.data
+          .filter((b) => b.status === "paid")
+          .reduce(
+            (sum, b) =>
+              sum +
+              (b.serviceId?.price ? Number(b.serviceId.price) : Number(b.price) || 0),
+            0
+          );
+
+        // Lấy 5 lịch hẹn mới nhất
+        const recentBookings = bookingsRes.data
+          .sort((a, b) => new Date(b.date) - new Date(a.date))
+          .slice(0, 5);
+
+        setStats({
+          users: usersCount,
+          services: servicesCount,
+          bookings: bookingsCount,
+          revenue,
+          recentBookings,
+        });
+      } catch (err) {
+        console.error("Lỗi Dashboard:", err);
+      }
+    };
+
+    fetchStats();
+  }, [token]);
+
+  // Dữ liệu biểu đồ
+  const chartData = [
+    { name: "Pending", value: stats.recentBookings.filter((b) => b.status === "pending").length },
+    { name: "Paid", value: stats.recentBookings.filter((b) => b.status === "paid").length },
+    { name: "Cancelled", value: stats.recentBookings.filter((b) => b.status === "cancelled").length },
+  ];
+
   return (
     <div className="min-h-screen bg-gray-100 p-8">
       <h1 className="text-3xl font-bold text-orange-600 mb-8">Dashboard</h1>
 
-      {/* Cards thống kê */}
+      {/* Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10">
         <div className="bg-white shadow-lg rounded-xl p-6">
           <h2 className="text-gray-500 text-sm">Người dùng</h2>
-          <p className="text-2xl font-bold text-orange-600">120</p>
+          <p className="text-2xl font-bold text-orange-600">{stats.users}</p>
         </div>
         <div className="bg-white shadow-lg rounded-xl p-6">
           <h2 className="text-gray-500 text-sm">Dịch vụ</h2>
-          <p className="text-2xl font-bold text-orange-600">35</p>
+          <p className="text-2xl font-bold text-orange-600">{stats.services}</p>
         </div>
         <div className="bg-white shadow-lg rounded-xl p-6">
           <h2 className="text-gray-500 text-sm">Lịch hẹn</h2>
-          <p className="text-2xl font-bold text-orange-600">58</p>
+          <p className="text-2xl font-bold text-orange-600">{stats.bookings}</p>
         </div>
         <div className="bg-white shadow-lg rounded-xl p-6">
           <h2 className="text-gray-500 text-sm">Doanh thu</h2>
-          <p className="text-2xl font-bold text-orange-600">12,500,000 VNĐ</p>
+          <p className="text-2xl font-bold text-orange-600">
+            {stats.revenue.toLocaleString()} VNĐ
+          </p>
         </div>
       </div>
 
-      {/* Bảng dữ liệu mẫu */}
-      <div className="bg-white shadow-lg rounded-xl p-6">
-        <h2 className="text-xl font-semibold text-gray-700 mb-4">Lịch hẹn gần đây</h2>
-        <table className="w-full border-collapse">
-          <thead>
-            <tr className="bg-gray-200 text-left">
-              <th className="p-3">Khách hàng</th>
-              <th className="p-3">Dịch vụ</th>
-              <th className="p-3">Ngày</th>
-              <th className="p-3">Trạng thái</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr className="border-b">
-              <td className="p-3">Nguyễn Văn A</td>
-              <td className="p-3">Cắt tóc nam</td>
-              <td className="p-3">10/12/2025</td>
-              <td className="p-3 text-green-600 font-semibold">Hoàn thành</td>
-            </tr>
-            <tr className="border-b">
-              <td className="p-3">Trần Thị B</td>
-              <td className="p-3">Nhuộm tóc</td>
-              <td className="p-3">09/12/2025</td>
-              <td className="p-3 text-orange-600 font-semibold">Đang chờ</td>
-            </tr>
-            <tr>
-              <td className="p-3">Lê Văn C</td>
-              <td className="p-3">Gội đầu</td>
-              <td className="p-3">08/12/2025</td>
-              <td className="p-3 text-red-500 font-semibold">Hủy</td>
-            </tr>
-          </tbody>
-        </table>
+      {/* Biểu đồ */}
+      <div className="bg-white shadow-lg rounded-xl p-6 mt-10">
+        <h2 className="text-xl font-semibold text-gray-700 mb-4">
+          Biểu đồ trạng thái
+        </h2>
+
+        <ResponsiveContainer width="100%" height={320}>
+          <BarChart data={chartData}>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="name" />
+            <YAxis allowDecimals={false} />
+            <Tooltip />
+            <Bar dataKey="value" fill="#fb923c" radius={[12, 12, 0, 0]} />
+          </BarChart>
+        </ResponsiveContainer>
       </div>
     </div>
   );
