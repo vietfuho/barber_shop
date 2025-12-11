@@ -15,15 +15,15 @@ const Profile = () => {
                     return;
                 }
 
-                const res = await fetch(`http://localhost:5000/api/users`, {
+                const res = await fetch(`http://localhost:5000/api/users/profile`, {
                     method: "GET",
                     headers: {
                         "Content-Type": "application/json",
                         Authorization: `Bearer ${token}`
                     },
                 });
-
-                setUser(res.data);
+                const data = await res.json();
+                setUser(data);
             } catch (err) {
                 console.log("Lỗi getMe:", err);
             } finally {
