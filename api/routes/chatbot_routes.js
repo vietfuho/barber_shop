@@ -11,5 +11,5 @@ router.get("/:id", chatbotController.getOne);
 router.post("/", verifyToken, chatbotController.create);
 router.put("/:id", verifyToken, chatbotController.update);
 router.delete("/:id", verifyToken, chatbotController.remove);
-
+router.post("/ask", verifyToken,chatbotController.ask)
 module.exports = router;

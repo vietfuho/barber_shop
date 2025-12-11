@@ -8,7 +8,15 @@ exports.create = async (req, res) => {
     res.status(500).json({ error: "Lỗi tạo dữ liệu chatbot" });
   }
 };
-
+exports.ask =  async (req, res) => {
+  const { question } = req.body;
+  const data = await ChatbotData.findOne({ question });
+  if (data) {
+    res.json({ answer: data.answer });
+  } else {
+    res.json({ answer: "Xin lỗi, tôi chưa hiểu câu hỏi này." });
+  }
+}
 exports.getAll = async (req, res) => {
   try {
     const data = await ChatbotData.find();
