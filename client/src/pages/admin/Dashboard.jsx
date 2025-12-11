@@ -98,12 +98,12 @@ const Dashboard = () => {
           <h2 className="text-gray-500 text-sm">Lịch hẹn</h2>
           <p className="text-2xl font-bold text-orange-600">{stats.bookings}</p>
         </div>
-        <div className="bg-white shadow-lg rounded-xl p-6">
-          <h2 className="text-gray-500 text-sm">Doanh thu</h2>
-          <p className="text-2xl font-bold text-orange-600">
+        {/* <div className="bg-white shadow-lg rounded-xl p-6"> */}
+          {/* <h2 className="text-gray-500 text-sm">Doanh thu</h2> */}
+          {/* <p className="text-2xl font-bold text-orange-600">
             {stats.revenue.toLocaleString()} VNĐ
-          </p>
-        </div>
+          </p> */}
+        {/* </div> */}
       </div>
 
       {/* Biểu đồ */}

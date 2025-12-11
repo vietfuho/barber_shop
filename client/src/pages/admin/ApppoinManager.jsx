@@ -6,27 +6,13 @@ export default function AppoinManager() {
   const [searchTerm, setSearchTerm] = useState("");
   const token = localStorage.getItem("token");
 
-  // 🔍 Hàm an toàn để parse kết quả API
-  const extractData = (raw) => {
-    if (Array.isArray(raw)) return raw;
-    if (Array.isArray(raw?.data)) return raw.data;
-    if (Array.isArray(raw?.bookings)) return raw.bookings;
-    if (Array.isArray(raw?.result)) return raw.result;
-    return [];
-  };
-
   // 📌 Lấy danh sách booking
   useEffect(() => {
     axios
       .get("http://localhost:5000/api/bookings", {
         headers: { Authorization: `Bearer ${token}` },
       })
-      .then((res) => {
-        console.log("API trả về FE:", res.data);
-        setBookings(extractData(res.data));
-        console.log("BOOKINGS RENDER:", bookings);
-
-      })
+      .then((res) => setBookings(res.data))
       .catch((err) => console.error("Lỗi lấy danh sách booking:", err));
   }, [token]);
 
@@ -45,14 +31,9 @@ export default function AppoinManager() {
   };
 
   // 🔎 Bộ lọc tìm kiếm
-  const filteredBookings = bookings.filter((b) => {
-    const term = searchTerm.toLowerCase();
-    return (
-      (b.fullName?.toLowerCase() || "").includes(term) ||
-      (b.phone?.toLowerCase() || "").includes(term) ||
-      (b.email?.toLowerCase() || "").includes(term)
-    );
-  });
+  const filteredBookings = bookings.filter((b) =>
+    b.fullName?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
     <div className="p-6">
@@ -61,10 +42,10 @@ export default function AppoinManager() {
       </h2>
 
       {/* Thanh tìm kiếm */}
-      <div className="flex justify-between items-center mb-4">
+      <div className="flex gap-3 items-center mb-4">
         <input
           type="text"
-          placeholder="Tìm kiếm theo tên, số điện thoại, email..."
+          placeholder="Tìm kiếm"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           className="border border-gray-300 p-2 rounded w-64 focus:ring-2 focus:ring-orange-400"
@@ -73,7 +54,7 @@ export default function AppoinManager() {
           onClick={() => setSearchTerm("")}
           className="bg-gray-300 text-gray-700 px-3 py-2 rounded hover:bg-gray-400"
         >
-          Xóa
+          Xóa tìm kiếm
         </button>
       </div>
 
@@ -106,19 +87,13 @@ export default function AppoinManager() {
                 <td className="border px-4 py-2">{b.fullName || "-"}</td>
                 <td className="border px-4 py-2">{b.phone || "-"}</td>
                 <td className="border px-4 py-2">{b.email || "-"}</td>
-
                 <td className="border px-4 py-2">
                   {b.date ? new Date(b.date).toLocaleString() : "-"}
                 </td>
-
                 <td className="border px-4 py-2">{b.note || "-"}</td>
-
                 <td className="border px-4 py-2">
-                  {b.createdAt
-                    ? new Date(b.createdAt).toLocaleString()
-                    : "-"}
+                  {b.createdAt ? new Date(b.createdAt).toLocaleString() : "-"}
                 </td>
-
                 <td className="border px-4 py-2 text-center space-x-2">
                   <button
                     onClick={() => handleDelete(b._id)}

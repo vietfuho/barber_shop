@@ -15,11 +15,12 @@ export default function AdminServices() {
   }, []);
 
   const handleDelete = async (id) => {
+    if (!window.confirm("Bạn có chắc muốn xóa dịch vụ này?")) return;
     try {
       await axios.delete(`http://localhost:5000/api/services/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      setServices(services.filter((s) => s._id !== id));
+      setServices((prev) => prev.filter((s) => s._id !== id));
       alert("Xóa dịch vụ thành công!");
     } catch (err) {
       console.error("Lỗi xóa dịch vụ:", err);
@@ -45,10 +46,10 @@ export default function AdminServices() {
           + Thêm dịch vụ
         </Link>
 
-        <div className="flex items-center space-x-2">
+        <div className="flex gap-3 items-center mb-4">
           <input
             type="text"
-            placeholder="Tìm kiếm theo tên, kiểu tóc hoặc màu nhuộm..."
+            placeholder="Tìm kiếm"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="border border-gray-300 p-2 rounded w-64 focus:ring-2 focus:ring-orange-400"
@@ -57,7 +58,7 @@ export default function AdminServices() {
             onClick={() => setSearchTerm("")}
             className="bg-gray-300 text-gray-700 px-3 py-2 rounded hover:bg-gray-400"
           >
-            Xóa
+            Xóa tìm kiếm
           </button>
         </div>
       </div>
