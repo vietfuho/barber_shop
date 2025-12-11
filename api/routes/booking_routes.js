@@ -19,4 +19,6 @@ router.put("/:id",verifyToken, checkRole("member"), bookingController.update);
 // Hủy lịch hẹn → cần đăng nhập
 router.delete("/:id",verifyToken, checkRole("member"), bookingController.remove);
 
+// Lấy lịch hẹn của chính mình
+router.get("/my", verifyToken, checkRole("member"), bookingController.getMyBookings);
 module.exports = router;

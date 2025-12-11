@@ -5,11 +5,12 @@ const userSchema = new mongoose.Schema({
   email:    { type: String, required: true, unique: true },
   password: { type: String, required: true },
   role:     { type: String, enum: ["admin", "staff", "member"], default: "member" },
-  createdAt: {
-    type: Date,
-    default: Date.now
-  }
-
+  address:  { type: String },   // không required
+  phone:    { type: String },   // không required
+  avatar:   { type: String },   // không required
+  birthday: { type: Date },
+  createdAt: { type: Date, default: Date.now }
 });
-const User =  mongoose.model("User", userSchema,"users");
+const User = mongoose.model("User", userSchema, "users");
+
 module.exports = User;

@@ -1,0 +1,137 @@
+import { useState, useEffect } from "react";
+import axios from "axios";
+
+export default function AppoinManager() {
+  const [bookings, setBookings] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const token = localStorage.getItem("token");
+
+  // 🔍 Hàm an toàn để parse kết quả API
+  const extractData = (raw) => {
+    if (Array.isArray(raw)) return raw;
+    if (Array.isArray(raw?.data)) return raw.data;
+    if (Array.isArray(raw?.bookings)) return raw.bookings;
+    if (Array.isArray(raw?.result)) return raw.result;
+    return [];
+  };
+
+  // 📌 Lấy danh sách booking
+  useEffect(() => {
+    axios
+      .get("http://localhost:5000/api/bookings", {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      .then((res) => {
+        console.log("API trả về FE:", res.data);
+        setBookings(extractData(res.data));
+        console.log("BOOKINGS RENDER:", bookings);
+
+      })
+      .catch((err) => console.error("Lỗi lấy danh sách booking:", err));
+  }, [token]);
+
+  // ❌ Xóa 1 booking
+  const handleDelete = async (id) => {
+    if (!window.confirm("Bạn có chắc muốn xóa lịch hẹn này?")) return;
+    try {
+      await axios.delete(`http://localhost:5000/api/bookings/${id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setBookings((prev) => prev.filter((b) => b._id !== id));
+      alert("Xóa lịch hẹn thành công!");
+    } catch (err) {
+      console.error("Lỗi xóa booking:", err);
+    }
+  };
+
+  // 🔎 Bộ lọc tìm kiếm
+  const filteredBookings = bookings.filter((b) => {
+    const term = searchTerm.toLowerCase();
+    return (
+      (b.fullName?.toLowerCase() || "").includes(term) ||
+      (b.phone?.toLowerCase() || "").includes(term) ||
+      (b.email?.toLowerCase() || "").includes(term)
+    );
+  });
+
+  return (
+    <div className="p-6">
+      <h2 className="text-2xl font-bold text-orange-500 mb-4">
+        Quản lý lịch hẹn
+      </h2>
+
+      {/* Thanh tìm kiếm */}
+      <div className="flex justify-between items-center mb-4">
+        <input
+          type="text"
+          placeholder="Tìm kiếm theo tên, số điện thoại, email..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="border border-gray-300 p-2 rounded w-64 focus:ring-2 focus:ring-orange-400"
+        />
+        <button
+          onClick={() => setSearchTerm("")}
+          className="bg-gray-300 text-gray-700 px-3 py-2 rounded hover:bg-gray-400"
+        >
+          Xóa
+        </button>
+      </div>
+
+      {/* Bảng danh sách booking */}
+      <table className="w-full border-collapse rounded-lg overflow-hidden shadow-lg">
+        <thead className="bg-orange-500 text-white">
+          <tr>
+            <th className="px-4 py-2">STT</th>
+            <th className="px-4 py-2">Họ và tên</th>
+            <th className="px-4 py-2">Số điện thoại</th>
+            <th className="px-4 py-2">Email</th>
+            <th className="px-4 py-2">Ngày hẹn</th>
+            <th className="px-4 py-2">Ghi chú</th>
+            <th className="px-4 py-2">Ngày tạo</th>
+            <th className="px-4 py-2">Hành động</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          {filteredBookings.length === 0 ? (
+            <tr>
+              <td colSpan="8" className="text-center p-4 text-gray-500">
+                Không có dữ liệu
+              </td>
+            </tr>
+          ) : (
+            filteredBookings.map((b, index) => (
+              <tr key={b._id || index} className="hover:bg-gray-100">
+                <td className="border px-4 py-2">{index + 1}</td>
+                <td className="border px-4 py-2">{b.fullName || "-"}</td>
+                <td className="border px-4 py-2">{b.phone || "-"}</td>
+                <td className="border px-4 py-2">{b.email || "-"}</td>
+
+                <td className="border px-4 py-2">
+                  {b.date ? new Date(b.date).toLocaleString() : "-"}
+                </td>
+
+                <td className="border px-4 py-2">{b.note || "-"}</td>
+
+                <td className="border px-4 py-2">
+                  {b.createdAt
+                    ? new Date(b.createdAt).toLocaleString()
+                    : "-"}
+                </td>
+
+                <td className="border px-4 py-2 text-center space-x-2">
+                  <button
+                    onClick={() => handleDelete(b._id)}
+                    className="bg-red-500 text-white px-3 py-1 rounded shadow hover:bg-red-600"
+                  >
+                    Xóa
+                  </button>
+                </td>
+              </tr>
+            ))
+          )}
+        </tbody>
+      </table>
+    </div>
+  );
+}

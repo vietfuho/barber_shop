@@ -77,3 +77,19 @@ exports.remove = async (req, res) => {
     res.status(500).json({ error: "Lỗi xóa lịch hẹn" });
   }
 };
+
+// Lấy lịch hẹn của chính chủ
+// =======================
+exports.getMyBookings = async (req, res) => {
+  try {
+    // Lấy email từ token (verifyToken gắn vào req.user)
+    const userEmail = req.user.email;
+
+    // Tìm tất cả booking có email khớp
+    const bookings = await Booking.find({ email: userEmail });
+
+    res.json(bookings);
+  } catch (err) {
+    res.status(500).json({ error: "Lỗi lấy lịch hẹn của bạn" });
+  }
+};

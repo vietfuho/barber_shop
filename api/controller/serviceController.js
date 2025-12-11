@@ -76,14 +76,14 @@ exports.getOne = async (req, res) => {
 // =======================
 exports.update = async (req, res) => {
   try {
-    const updateData = { ...req.body };
+    let updateData = { ...req.body };
 
     // Nếu có file upload
     if (req.file) {
       updateData.imageFile = req.file.filename;
     }
 
-    // Parse colorOptions nếu có
+    // Parse colorOptions
     if (updateData.colorOptions) {
       try {
         updateData.colorOptions = JSON.parse(updateData.colorOptions);
@@ -94,10 +94,27 @@ exports.update = async (req, res) => {
       }
     }
 
-    const service = await Service.findByIdAndUpdate(req.params.id, updateData, { new: true });
-    if (!service) return res.status(404).json({ error: "Không tìm thấy dịch vụ để cập nhật" });
+    // Ép kiểu
+    if (updateData.price) updateData.price = Number(updateData.price);
+    if (updateData.duration) updateData.duration = Number(updateData.duration);
+    if (updateData.isActive !== undefined) {
+      updateData.isActive =
+        updateData.isActive === "true" || updateData.isActive === true;
+    }
+
+    const service = await Service.findByIdAndUpdate(
+      req.params.id,
+      updateData,
+      { new: true }
+    );
+    if (!service)
+      return res
+        .status(404)
+        .json({ error: "Không tìm thấy dịch vụ để cập nhật" });
+
     res.json(service);
   } catch (err) {
+    console.error("Lỗi cập nhật dịch vụ:", err);
     res.status(500).json({ error: "Lỗi cập nhật dịch vụ" });
   }
 };

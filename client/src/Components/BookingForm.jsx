@@ -57,7 +57,7 @@ export default function BookingForm() {
           fullName: formData.name,
           phone: formData.phone,
           email: formData.email,
-          date: formData.date + "T" + formData.time, // ghép ngày + giờ
+          date: formData.date + "T" + formData.time + ":00.000Z", // ghép ngày + giờ chuẩn ISO
           note: formData.note,
         }),
       });
@@ -65,6 +65,15 @@ export default function BookingForm() {
       const data = await res.json();
       if (res.ok) {
         alert("Đặt lịch thành công!");
+        // reset form
+        setFormData({
+          name: "",
+          phone: "",
+          email: "",
+          date: "",
+          time: "",
+          note: "",
+        });
         navigate("/"); // 🔥 quay về trang chủ
       } else {
         alert("Có lỗi: " + (data.error || "Không xác định"));

@@ -37,13 +37,12 @@ export default function ServiceCard({ service }) {
 
         {/* Nút hành động */}
         <div className="flex gap-3 mt-auto">
-          <Link
-            to={`/services/details`}
-            className="flex-1 text-center bg-white border border-orange-500 text-orange-500 px-4 py-2 rounded-lg hover:bg-orange-100 transition"
-          >
-            Tìm hiểu thêm 
-          </Link>
-          
+         <Link
+  to={`/services/details/${service._id}`}
+  className="flex-1 text-center bg-white border border-orange-500 text-orange-500 px-4 py-2 rounded-lg hover:bg-orange-100 transition"
+>
+  Xem chi tiết
+</Link>
         </div>
       </div>
     </div>

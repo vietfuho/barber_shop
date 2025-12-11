@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Link, NavLink } from "react-router-dom";
 import { IoMdCut } from "react-icons/io";
 import { CgProfile } from "react-icons/cg";
-
+import { LuCalendarClock } from "react-icons/lu";
 const Navbar = ({ isLoggedIn, setIsLoggedIn }) => {
   // const [isOpen, setIsOpen] = useState(false);
   const [openMenu, setOpenMenu] = useState(false);
@@ -20,7 +20,7 @@ const Navbar = ({ isLoggedIn, setIsLoggedIn }) => {
           <div className="flex items-center space-x-2">
             <Link to="/" className="flex items-center font-bold text-gray-800 text-[24px]">
               <IoMdCut className="text-orange-400" />
-              <span className="ml-2 text-white">Elite Barber</span>
+              <span className="ml-2 text-orange-400">Elite Barber</span>
             </Link>
           </div>
 
@@ -42,7 +42,8 @@ const Navbar = ({ isLoggedIn, setIsLoggedIn }) => {
                 <NavLink to="/register" className={({ isActive }) => isActive ? "bg-orange-600 text-white px-4 py-2 rounded" : "bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600 transition"}>Đăng ký</NavLink>
               </>
             ) : (
-              <div className="relative">
+              <div className="relative flex items-center space-x-4">
+                 <Link to="/mybookings"> <LuCalendarClock  size={28} className="text-orange-500"/> </Link>
                 <button onClick={() => setOpenMenu(!openMenu)}>
                   <CgProfile size={28} className="text-orange-500" />
                 </button>

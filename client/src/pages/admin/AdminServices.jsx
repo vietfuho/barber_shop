@@ -26,11 +26,14 @@ export default function AdminServices() {
     }
   };
 
-  const filteredServices = services.filter(
-    (s) =>
-      (s.name?.toLowerCase() || "").includes(searchTerm.toLowerCase()) ||
-      (s.category?.toLowerCase() || "").includes(searchTerm.toLowerCase())
-  );
+  const filteredServices = services.filter((s) => {
+    const term = searchTerm.toLowerCase();
+    return (
+      (s.name?.toLowerCase() || "").includes(term) ||
+      (s.styleOptions?.toLowerCase() || "").includes(term) ||
+      (s.colorOptions?.map((c) => c.label.toLowerCase()).join(" ") || "").includes(term)
+    );
+  });
 
   return (
     <div className="p-6">
@@ -45,7 +48,7 @@ export default function AdminServices() {
         <div className="flex items-center space-x-2">
           <input
             type="text"
-            placeholder="Tìm kiếm theo tên hoặc danh mục..."
+            placeholder="Tìm kiếm theo tên, kiểu tóc hoặc màu nhuộm..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="border border-gray-300 p-2 rounded w-64 focus:ring-2 focus:ring-orange-400"
@@ -59,12 +62,14 @@ export default function AdminServices() {
         </div>
       </div>
 
+      {/* Bảng danh sách */}
       <table className="w-full border-collapse rounded-lg overflow-hidden shadow-lg">
         <thead className="bg-orange-500 text-white">
           <tr>
             <th className="px-4 py-2">STT</th>
             <th className="px-4 py-2">Tên dịch vụ</th>
             <th className="px-4 py-2">Kiểu tóc</th>
+            <th className="px-4 py-2">Màu nhuộm</th>
             <th className="px-4 py-2">Mô tả</th>
             <th className="px-4 py-2">Giá</th>
             <th className="px-4 py-2">Thời gian</th>
@@ -77,21 +82,35 @@ export default function AdminServices() {
             <tr key={s._id} className="hover:bg-gray-100">
               <td className="border px-4 py-2">{index + 1}</td>
               <td className="border px-4 py-2">{s.name}</td>
-
-              {/* Kiểu tóc: giờ chỉ là chuỗi */}
               <td className="border px-4 py-2">
-                {s.styleOptions ? (
-                  <span className="text-sm text-gray-700">{s.styleOptions}</span>
+                {s.styleOptions || (
+                  <span className="text-gray-400 text-sm">Không có</span>
+                )}
+              </td>
+              <td className="border px-4 py-2">
+                {s.colorOptions && s.colorOptions.length > 0 ? (
+                  <ul className="space-y-1">
+                    {s.colorOptions.map((c, i) => (
+                      <li key={i} className="flex items-center gap-2">
+                        <span>{c.label}</span>
+                        {c.swatch && (
+                          <span
+                            className="inline-block w-4 h-4 rounded border"
+                            style={{ backgroundColor: c.swatch }}
+                          ></span>
+                        )}
+                      </li>
+                    ))}
+                  </ul>
                 ) : (
                   <span className="text-gray-400 text-sm">Không có</span>
                 )}
               </td>
-
               <td className="border px-4 py-2">{s.description}</td>
-              <td className="border px-4 py-2">{s.price?.toLocaleString()}đ</td>
-              <td className="border px-4 py-2">{s.duration} phút</td>
-
-              {/* Ảnh */}
+              <td className="border px-4 py-2">
+                {(s.price || 0).toLocaleString()}đ
+              </td>
+              <td className="border px-4 py-2">{s.duration || 0} phút</td>
               <td className="border px-4 py-2">
                 {s.imageUrl ? (
                   <img
@@ -109,11 +128,9 @@ export default function AdminServices() {
                   <span className="text-gray-400 text-sm">Không có ảnh</span>
                 )}
               </td>
-
-              {/* Hành động */}
               <td className="border px-4 py-2 text-center space-x-2">
                 <Link
-                  to={`/services/details/${s._id}`}
+                  to={`/admin/services/details/${s._id}`}
                   className="bg-orange-500 text-white px-3 py-1 rounded shadow hover:bg-orange-600"
                 >
                   Chi tiết

@@ -12,7 +12,7 @@ const multer = require("multer");
 router.get("/", serviceController.getAll);
 
 // Xem chi tiết một dịch vụ theo ID
-router.get("/details/:id", serviceController.getOne);
+router.get("/:id", serviceController.getOne);
 
 //  Admin routes (cần token + role admin)
 
@@ -20,7 +20,7 @@ router.get("/details/:id", serviceController.getOne);
 router.post("/add", verifyToken, checkRole("admin"),upload.single("image"), serviceController.create);
 
 // Cập nhật dịch vụ theo ID
-router.put("/:id", verifyToken, checkRole("admin"), serviceController.update);
+router.put("/:id", verifyToken, checkRole("admin"), upload.single("image"), serviceController.update);
 
 // Xóa dịch vụ theo ID
 router.delete("/:id",verifyToken,checkRole("admin"),serviceController.remove);
