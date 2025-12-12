@@ -8,8 +8,9 @@ function Chatbot() {
   const [messages, setMessages] = useState([
     { sender: "bot", text: "Xin chào! Tôi có thể giúp gì cho bạn?" }
   ]);
+  const [input, setInput] = useState(""); // lưu câu hỏi nhập tay
 
-  // Lấy dữ liệu chatbot từ API
+  // Lấy dữ liệu chatbot từ API (các câu hỏi gợi ý)
   useEffect(() => {
     if (open) {
       axios.get("http://localhost:5000/api/chatbot")
@@ -18,7 +19,7 @@ function Chatbot() {
     }
   }, [open]);
 
-  // Khi người dùng chọn một câu hỏi
+  // Khi người dùng chọn một câu hỏi gợi ý
   const handleSelect = (item) => {
     const newMessages = [
       ...messages,
@@ -26,6 +27,30 @@ function Chatbot() {
       { sender: "bot", text: item.answer }
     ];
     setMessages(newMessages);
+  };
+
+  // Khi người dùng nhập tay và gửi
+  const handleSend = async () => {
+    if (!input.trim()) return;
+
+    // Thêm tin nhắn user
+    const newMessages = [...messages, { sender: "user", text: input }];
+    setMessages(newMessages);
+
+    try {
+      // Gọi API backend để lấy câu trả lời
+      const res = await axios.post("http://localhost:5000/api/chatbot/ask", {
+        question: input
+      });
+      const answer = res.data.answer || "Xin lỗi, tôi chưa có câu trả lời.";
+
+      setMessages([...newMessages, { sender: "bot", text: answer }]);
+    } catch (err) {
+      console.error("Lỗi gửi câu hỏi:", err);
+      setMessages([...newMessages, { sender: "bot", text: "Có lỗi xảy ra khi xử lý câu hỏi." }]);
+    }
+
+    setInput(""); // reset input
   };
 
   return (
@@ -63,30 +88,38 @@ function Chatbot() {
             ))}
 
             {/* Hiển thị các lựa chọn từ API */}
-            <div className="mt-2">
-              <p className="text-sm text-gray-500">Bạn có thể chọn nhanh:</p>
-              <div className="flex flex-wrap gap-2 mt-1">
-                {options.map((item) => (
-                  <button
-                    key={item._id}
-                    onClick={() => handleSelect(item)}
-                    className="bg-gray-100 border px-2 py-1 rounded text-sm hover:bg-blue-100"
-                  >
-                    {item.question}
-                  </button>
-                ))}
+            {options.length > 0 && (
+              <div className="mt-2">
+                <p className="text-sm text-gray-500">Bạn có thể chọn nhanh:</p>
+                <div className="flex flex-wrap gap-2 mt-1">
+                  {options.map((item) => (
+                    <button
+                      key={item._id}
+                      onClick={() => handleSelect(item)}
+                      className="bg-gray-100 border px-2 py-1 rounded text-sm hover:bg-blue-100"
+                    >
+                      {item.question}
+                    </button>
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
           </div>
 
-          {/* Input (nếu muốn nhập tay) */}
+          {/* Input nhập tay */}
           <div className="p-2 border-t flex">
             <input
               type="text"
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
               placeholder="Nhập câu hỏi..."
               className="flex-1 border rounded px-2 py-1 text-sm focus:outline-none"
+              onKeyDown={(e) => e.key === "Enter" && handleSend()}
             />
-            <button className="ml-2 bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700">
+            <button
+              onClick={handleSend}
+              className="ml-2 bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700"
+            >
               Gửi
             </button>
           </div>

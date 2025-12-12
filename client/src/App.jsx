@@ -24,6 +24,8 @@ import Premium from "./Components/Premium";
 import RegisterStaff from "./Components/button/RegisterStaff";
 import EditAppoin from "./pages/EditAppoin";
 
+// 👉 import Chatbot
+import Chatbot from "./pages/Chatbot";
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -46,7 +48,7 @@ function App() {
           <Route path="/services" element={<ServicesPrice />} />
           <Route path="/gallery" element={<Gallery />} />
           <Route path="/team" element={<Team />} />
-          
+
           <Route path="/contact" element={<Contact />} />
           <Route path="/booking" element={<Booking />} />
           <Route path="/shop" element={<Shop />} />
@@ -55,8 +57,6 @@ function App() {
           <Route path="/premium" element={<Premium />} />
           <Route path="/registerStaff" element={<RegisterStaff />} />
           <Route path="/edit-appoint/:id" element={<EditAppoin />} />
-
-         
 
           {/* Auth routes */}
           <Route
@@ -75,6 +75,9 @@ function App() {
 
       {/* Footer chỉ hiển thị khi không phải admin */}
       {!isAdminRoute && <Footer />}
+
+      {/* 👉 Chatbot luôn hiển thị ở mọi trang (trừ admin nếu muốn) */}
+      {!isAdminRoute && <Chatbot />}
     </div>
   );
 }
