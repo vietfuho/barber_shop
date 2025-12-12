@@ -4,9 +4,8 @@ import { useNavigate } from "react-router-dom";
 export default function BookingForm() {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    name: "",
+    fullName: "",
     phone: "",
-    email: "",
     date: "",
     time: "",
     note: "",
@@ -54,10 +53,9 @@ export default function BookingForm() {
           ...(token && { Authorization: "Bearer " + token }),
         },
         body: JSON.stringify({
-          fullName: formData.name,
+          fullName: formData.fullName,
           phone: formData.phone,
-          email: formData.email,
-          date: formData.date + "T" + formData.time + ":00.000Z", // ghép ngày + giờ chuẩn ISO
+          date: `${formData.date}T${formData.time}:00`,
           note: formData.note,
         }),
       });
@@ -65,16 +63,14 @@ export default function BookingForm() {
       const data = await res.json();
       if (res.ok) {
         alert("Đặt lịch thành công!");
-        // reset form
         setFormData({
-          name: "",
+          fullName: "",
           phone: "",
-          email: "",
           date: "",
           time: "",
           note: "",
         });
-        navigate("/mybookings"); // 🔥 quay về trang chủ
+        navigate("/mybookings");
       } else {
         alert("Có lỗi: " + (data.error || "Không xác định"));
       }
@@ -95,9 +91,9 @@ export default function BookingForm() {
           <form onSubmit={handleSubmit} className="space-y-3 text-xs text-neutral-800">
             <input
               type="text"
-              name="name"
+              name="fullName"
               placeholder="Họ và tên *"
-              value={formData.name}
+              value={formData.fullName}
               onChange={handleChange}
               required
               className="w-full border border-orange-300 rounded px-3 py-1.5 text-sm"
@@ -110,15 +106,6 @@ export default function BookingForm() {
               value={formData.phone}
               onChange={handleChange}
               required
-              className="w-full border border-orange-300 rounded px-3 py-1.5 text-sm"
-            />
-
-            <input
-              type="email"
-              name="email"
-              placeholder="Email"
-              value={formData.email}
-              onChange={handleChange}
               className="w-full border border-orange-300 rounded px-3 py-1.5 text-sm"
             />
 
@@ -163,10 +150,6 @@ export default function BookingForm() {
             >
               Xác nhận đặt lịch
             </button>
-
-            <p className="text-center text-[11px] text-gray-500 mt-1">
-              Hoặc gọi trực tiếp: <span className="font-semibold">0123 456 789</span>
-            </p>
           </form>
         </div>
       </div>

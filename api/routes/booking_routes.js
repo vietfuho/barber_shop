@@ -8,7 +8,7 @@ const checkRole = require("../middleware/checkRole");
 router.post("/",verifyToken, checkRole("member"), bookingController.create);  //tạo lịch hẹn nè 
 
 // Xem tất cả lịch hẹn → chỉ admin/staff (sau này thêm checkRole)
-router.get("/",verifyToken, checkRole(["staff", "admin"]), bookingController.getAll);
+router.get("/",verifyToken, checkRole(["member","staff", "admin"]), bookingController.getAll);
 
 // Xem chi tiết lịch hẹn → cần đăng nhập (chính chủ hoặc staff)
 router.get("/:id",verifyToken, checkRole("member"), bookingController.getOne);
@@ -19,6 +19,6 @@ router.put("/:id",verifyToken, checkRole("member"), bookingController.update);
 // Hủy lịch hẹn → cần đăng nhập
 router.delete("/:id",verifyToken, checkRole("member"), bookingController.remove);
 
-// Lấy lịch hẹn của chính mình
-router.get("/my/:id", verifyToken, bookingController.getMyBookingById);
+
+
 module.exports = router;

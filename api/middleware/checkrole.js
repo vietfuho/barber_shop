@@ -1,3 +1,4 @@
+// middleware/checkRole.js
 module.exports = function (roles = []) {
   // Nếu roles là string thì chuyển thành array
   if (typeof roles === "string") {
@@ -9,9 +10,14 @@ module.exports = function (roles = []) {
       return res.status(401).json({ error: "Chưa đăng nhập" });
     }
 
-    if (!roles.includes(req.user.role)) {
-      return res.status(403).json({ error: "Không có quyền truy cập" });
+    if (!req.user.role) {
+      return res.status(403).json({ error: "Không xác định được quyền" });
     }
+
+    if (!roles.includes(req.user.role)) {
+      return res.status(403).json({ error: `Role ${req.user.role} không được phép truy cập` });
+    }
+
     next();
   };
 };

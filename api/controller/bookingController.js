@@ -1,8 +1,7 @@
 const Booking = require("../models/booking");
 
-// =======================
+
 // Tạo lịch hẹn
-// =======================
 exports.create = async (req, res) => {
   try {
     const { fullName, phone, email, date, note } = req.body;
@@ -12,19 +11,28 @@ exports.create = async (req, res) => {
       return res.status(400).json({ error: "Thiếu thông tin bắt buộc" });
     }
 
-    // Kiểm tra token có user không (phòng trường hợp middleware không chạy)
+    // Kiểm tra token có user không
     if (!req.user || !req.user.id) {
       return res.status(401).json({ error: "Không xác định được người dùng" });
     }
 
-    // Tạo booking và tự gán userId
+    // Kiểm tra trùng lịch hẹn (ví dụ cùng user và cùng thời điểm)
+    const existed = await Booking.findOne({
+      userId: req.user.id,
+      date: new Date(date)
+    });
+    if (existed) {
+      return res.status(409).json({ error: "Bạn đã có lịch hẹn tại thời điểm này" });
+    }
+
+    // Tạo booking mới
     const booking = await Booking.create({
       fullName,
       phone,
       email,
       date,
       note,
-      userId: req.user.id, // ⬅️ tự động lấy từ token
+      userId: req.user.id,
     });
 
     res.status(201).json(booking);
@@ -33,10 +41,7 @@ exports.create = async (req, res) => {
   }
 };
 
-
-// =======================
 // Lấy tất cả lịch hẹn
-// =======================
 exports.getAll = async (req, res) => {
   try {
     const bookings = await Booking.find();
@@ -46,9 +51,8 @@ exports.getAll = async (req, res) => {
   }
 };
 
-// =======================
+
 // Lấy 1 lịch hẹn
-// =======================
 exports.getOne = async (req, res) => {
   try {
     const booking = await Booking.findById(req.params.id);
@@ -60,9 +64,9 @@ exports.getOne = async (req, res) => {
   }
 };
 
-// =======================
+
 // Cập nhật lịch hẹn
-// =======================
+
 exports.update = async (req, res) => {
   try {
     const booking = await Booking.findByIdAndUpdate(req.params.id, req.body, { new: true });
@@ -87,25 +91,4 @@ exports.remove = async (req, res) => {
   }
 };
 
-// Lấy lịch hẹn của chính chủ
-// =======================
 
-// Lấy 1 lịch hẹn của chính chủ theo ID
-exports.getMyBookingById = async (req, res) => {
-  try {
-    const booking = await Booking.findById(req.params.id).populate("serviceId");
-
-    if (!booking) {
-      return res.status(404).json({ error: "Không tìm thấy lịch hẹn" });
-    }
-
-    // Kiểm tra quyền: chỉ chính chủ mới được xem
-    if (booking.userId.toString() !== req.user.id) {
-      return res.status(403).json({ error: "Bạn không có quyền xem lịch hẹn này" });
-    }
-
-    res.json(booking);
-  } catch (err) {
-    res.status(500).json({ error: "Lỗi khi lấy lịch hẹn", details: err.message });
-  }
-};

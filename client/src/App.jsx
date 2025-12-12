@@ -22,6 +22,7 @@ import MyBookings from "./pages/MyBookings";
 import Profile from "./pages/Profile";
 import Premium from "./Components/Premium";
 import RegisterStaff from "./Components/button/RegisterStaff";
+import EditAppoin from "./pages/EditAppoin";
 
 
 function App() {
@@ -30,7 +31,7 @@ function App() {
   const isAdminRoute = location.pathname.startsWith("/admin");
 
   return (
-    <>
+    <div className="min-h-screen flex flex-col">
       {/* Navbar chỉ hiển thị khi không phải admin */}
       {!isAdminRoute && (
         <Navbar isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn} />
@@ -53,6 +54,8 @@ function App() {
           <Route path="/profile" element={<Profile />} />
           <Route path="/premium" element={<Premium />} />
           <Route path="/registerStaff" element={<RegisterStaff />} />
+          <Route path="/edit-appoint/:id" element={<EditAppoin />} />
+
          
 
           {/* Auth routes */}
@@ -72,7 +75,7 @@ function App() {
 
       {/* Footer chỉ hiển thị khi không phải admin */}
       {!isAdminRoute && <Footer />}
-    </>
+    </div>
   );
 }
 

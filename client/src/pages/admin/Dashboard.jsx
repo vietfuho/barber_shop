@@ -39,7 +39,7 @@ const Dashboard = () => {
         const servicesCount = servicesRes.data.length;
         const bookings = bookingsRes.data;
 
-        // Doanh thu
+        // Doanh thu (nếu cần)
         const revenue = bookings
           .filter((b) => b.status === "paid")
           .reduce(
@@ -51,7 +51,7 @@ const Dashboard = () => {
             0
           );
 
-        // 5 lịch hẹn mới nhất (giữ nguyên nếu bạn cần)
+        // 5 lịch hẹn mới nhất
         const recentBookings = [...bookings]
           .sort((a, b) => new Date(b.date) - new Date(a.date))
           .slice(0, 5);
@@ -71,42 +71,14 @@ const Dashboard = () => {
     fetchStats();
   }, [token]);
 
-  // Dữ liệu biểu đồ tổng theo toàn bộ bookings (không chỉ recent)
-  const bookingsAll = stats.recentBookings.length
-    ? null // chỉ để tránh warning khi chưa set
-    : null; // không dùng, dữ liệu lấy lại từ API ngay trên
+  // Biểu đồ hiển thị số lượng Users, Services, Bookings
+  const chartData = [
+    { name: "Người dùng", value: stats.users },
+    { name: "Dịch vụ", value: stats.services },
+    { name: "Lịch hẹn", value: stats.bookings },
+  ];
 
-  const chartCounts = {
-    pending: stats.recentBookings.length
-      ? stats.recentBookings.filter((b) => b.status === "pending").length
-      : 0,
-    paid: stats.recentBookings.length
-      ? stats.recentBookings.filter((b) => b.status === "paid").length
-      : 0,
-    cancelled: stats.recentBookings.length
-      ? stats.recentBookings.filter((b) => b.status === "cancelled").length
-      : 0,
-  };
-
-  // Nếu bạn muốn lấy từ toàn bộ bookings thay vì recentBookings,
-  // thay vì dùng stats.recentBookings ở trên, hãy tính từ API (bookingsRes.data)
-  // Để đơn giản, mình thêm guard khi tất cả bằng 0 sẽ chia đều 3 phần.
-  const total = chartCounts.pending + chartCounts.paid + chartCounts.cancelled;
-
-  const chartData =
-    total > 0
-      ? [
-          { name: "Pending", value: chartCounts.pending },
-          { name: "Paid", value: chartCounts.paid },
-          { name: "Cancelled", value: chartCounts.cancelled },
-        ]
-      : [
-          { name: "Pending", value: 1 },
-          { name: "Paid", value: 1 },
-          { name: "Cancelled", value: 1 },
-        ];
-
-  const COLORS = ["#facc15", "#22c55e", "#ef4444"]; // vàng, xanh lá, đỏ
+  const COLORS = ["#3b82f6", "#f97316", "#22c55e"]; // xanh, cam, xanh lá
 
   return (
     <div className="min-h-screen bg-gray-100 p-8">
@@ -126,8 +98,8 @@ const Dashboard = () => {
           <h2 className="text-gray-500 text-sm">Lịch hẹn</h2>
           <p className="text-2xl font-bold text-orange-600">{stats.bookings}</p>
         </div>
-        {/* Doanh thu (bật nếu cần)
-        <div className="bg-white shadow-lg rounded-xl p-6">
+        {/* Doanh thu (nếu cần) */}
+        {/* <div className="bg-white shadow-lg rounded-xl p-6">
           <h2 className="text-gray-500 text-sm">Doanh thu</h2>
           <p className="text-2xl font-bold text-orange-600">
             {stats.revenue.toLocaleString()} VNĐ
@@ -135,7 +107,7 @@ const Dashboard = () => {
         </div> */}
       </div>
 
-      {/* Biểu đồ tổng (hình tròn) */}
+      {/* Biểu đồ tổng (Users, Services, Bookings) */}
       <div className="bg-white shadow-lg rounded-xl p-6 mt-10">
         <h2 className="text-xl font-semibold text-gray-700 mb-4">
           Biểu đồ tổng
@@ -163,10 +135,7 @@ const Dashboard = () => {
                 ))}
               </Pie>
               <Tooltip
-                formatter={(value, name) => [
-                  `${value} mục`,
-                  name,
-                ]}
+                formatter={(value, name) => [`${value} mục`, name]}
               />
               <Legend />
             </PieChart>
