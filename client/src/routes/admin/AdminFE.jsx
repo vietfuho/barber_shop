@@ -9,6 +9,7 @@ import Sidebar from "../../Components/Admin/Sidebar";
 import Dashboard from "../../pages/admin/Dashboard";
 import UserMana from "../../pages/admin/UserMana";
 import AppoinManager from "../../pages/admin/ApppoinManager";
+import Aprove from "../../pages/admin/Aprove";
 
 const AdminFE = () => {
   return (
@@ -31,7 +32,8 @@ const AdminFE = () => {
             <Route path="services/edit/:id" element={<EditService />} />
             <Route path="users" element={<UserMana />} />
             <Route path="bookings" element={<AppoinManager />} />
-
+            <Route path="bookings" element={<Aprove />} />
+            
           </Routes>
         </main>
       </div>

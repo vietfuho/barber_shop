@@ -23,6 +23,7 @@ import Profile from "./pages/Profile";
 import Premium from "./Components/Premium";
 import RegisterStaff from "./Components/button/RegisterStaff";
 
+
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const location = useLocation();
@@ -52,6 +53,7 @@ function App() {
           <Route path="/profile" element={<Profile />} />
           <Route path="/premium" element={<Premium />} />
           <Route path="/registerStaff" element={<RegisterStaff />} />
+         
 
           {/* Auth routes */}
           <Route

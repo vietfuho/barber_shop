@@ -48,15 +48,15 @@ export default function UserMana() {
     }
   };
 
-      // Bộ lọc tìm kiếm
-      const filteredUsers = users.filter((u) => {
-        const term = searchTerm.toLowerCase();
-        return (
-          (u.username?.toLowerCase() || "").includes(term) ||
-          (u.email?.toLowerCase() || "").includes(term) ||
-          (u.phone?.toLowerCase() || "").includes(term)
-        );
-      });
+  // Bộ lọc tìm kiếm
+  const filteredUsers = users.filter((u) => {
+    const term = searchTerm.toLowerCase();
+    return (
+      (u.username?.toLowerCase() || "").includes(term) ||
+      (u.email?.toLowerCase() || "").includes(term) ||
+      (u.phone?.toLowerCase() || "").includes(term)
+    );
+  });
 
   return (
     <div className="p-6">
@@ -73,18 +73,12 @@ export default function UserMana() {
           onChange={(e) => setSearchTerm(e.target.value)}
           className="border border-gray-300 p-2 rounded w-64 focus:ring-2 focus:ring-orange-400"
         />
-        
+
         <button
           onClick={() => setSearchTerm("")}
           className="bg-gray-300 text-gray-700 px-3 py-2 rounded hover:bg-gray-400"
         >
           Xóa
-        </button>
-        <button
-          onClick={() => setSearchTerm("")}
-          className="bg-green-600 text-white px-3 py-2 rounded"
-        >
-          Phê Duyệt
         </button>
       </div>
 
@@ -133,7 +127,6 @@ export default function UserMana() {
                 >
                   Xóa
                 </button>
-                
               </td>
             </tr>
           ))}
