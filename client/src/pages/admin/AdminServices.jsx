@@ -63,7 +63,6 @@ export default function AdminServices() {
         </div>
       </div>
 
-      {/* Bảng danh sách */}
       <table className="w-full border-collapse rounded-lg overflow-hidden shadow-lg">
         <thead className="bg-orange-500 text-white">
           <tr>
@@ -75,7 +74,7 @@ export default function AdminServices() {
             <th className="px-4 py-2">Giá</th>
             <th className="px-4 py-2">Thời gian</th>
             <th className="px-4 py-2">Ảnh</th>
-            <th className="px-4 py-2">Hành động</th>
+            <th className="px-4 py-2 w-[200px]">Hành động</th>
           </tr>
         </thead>
         <tbody>
@@ -107,7 +106,7 @@ export default function AdminServices() {
                   <span className="text-gray-400 text-sm">Không có</span>
                 )}
               </td>
-              <td className="border px-4 py-2">{s.description}</td>
+              <td className="border px-4 py-2 break-words">{s.description}</td>
               <td className="border px-4 py-2">
                 {(s.price || 0).toLocaleString()}đ
               </td>
@@ -129,25 +128,27 @@ export default function AdminServices() {
                   <span className="text-gray-400 text-sm">Không có ảnh</span>
                 )}
               </td>
-              <td className="border px-4 py-2 text-center space-x-2">
-                <Link
-                  to={`/admin/services/details/${s._id}`}
-                  className="bg-orange-500 text-white px-3 py-1 rounded shadow hover:bg-orange-600"
-                >
-                  Chi tiết
-                </Link>
-                <Link
-                  to={`/admin/services/edit/${s._id}`}
-                  className="bg-blue-500 text-white px-3 py-1 rounded shadow hover:bg-blue-600"
-                >
-                  Sửa
-                </Link>
-                <button
-                  onClick={() => handleDelete(s._id)}
-                  className="bg-red-500 text-white px-3 py-1 rounded shadow hover:bg-red-600"
-                >
-                  Xóa
-                </button>
+              <td className="border px-4 py-2 text-center whitespace-nowrap w-[200px]">
+                <div className="flex justify-center items-center gap-2">
+                  <Link
+                    to={`/admin/services/details/${s._id}`}
+                    className="bg-orange-500 text-white px-3 py-1 rounded shadow hover:bg-orange-600"
+                  >
+                    Chi tiết
+                  </Link>
+                  <Link
+                    to={`/admin/services/edit/${s._id}`}
+                    className="bg-blue-500 text-white px-3 py-1 rounded shadow hover:bg-blue-600"
+                  >
+                    Sửa
+                  </Link>
+                  <button
+                    onClick={() => handleDelete(s._id)}
+                    className="bg-red-500 text-white px-3 py-1 rounded shadow hover:bg-red-600"
+                  >
+                    Xóa
+                  </button>
+                </div>
               </td>
             </tr>
           ))}

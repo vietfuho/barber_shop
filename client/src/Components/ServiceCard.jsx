@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import { Card, Row, Col, Tag } from "antd";
 import BookingButton from "./button/BookingButton";
+
 const { Meta } = Card;
 
 const ServiceCard = () => {
@@ -35,14 +36,20 @@ const ServiceCard = () => {
     <div style={{ padding: "20px" }}>
       <Row gutter={[24, 24]}>
         {services.map((service) => {
-          const imageSrc = service.imageUrl
-            ? `http://localhost:5000/${service.imageUrl}`
-            : service.imageFile
-            ? `http://localhost:5000/uploads/${service.imageFile}`
-            : null;
+          const imageSrc = (() => {
+            if (service.imageUrl) {
+              return service.imageUrl.startsWith("http")
+                ? service.imageUrl
+                : `http://localhost:5000/${service.imageUrl}`;
+            }
+            if (service.imageFile) {
+              return `http://localhost:5000/uploads/${service.imageFile}`;
+            }
+            return null;
+          })();
 
           return (
-            <Col span={8} key={service._id}>  {/* 3 cột cố định */}
+            <Col span={8} key={service._id}>
               <Card
                 hoverable
                 cover={
@@ -55,8 +62,26 @@ const ServiceCard = () => {
                         objectFit: "cover",
                         borderRadius: "8px 8px 0 0",
                       }}
+                      onError={(e) => {
+                        e.target.onerror = null;
+                        e.target.src = "/fallback-image.jpg"; // ảnh mặc định nếu lỗi
+                      }}
                     />
-                  ) : null
+                  ) : (
+                    <div
+                      style={{
+                        height: "200px",
+                        backgroundColor: "#f0f0f0",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        borderRadius: "8px 8px 0 0",
+                        color: "#888",
+                      }}
+                    >
+                      Không có ảnh
+                    </div>
+                  )
                 }
               >
                 <Meta
@@ -100,15 +125,15 @@ const ServiceCard = () => {
                           color: "orange",
                         }}
                       >
-                        Giá: {service.price} VNĐ
+                        Giá: {service.price?.toLocaleString()} VNĐ
                       </p>
 
                       <p style={{ color: "#888", fontSize: 13 }}>
                         Thời gian: {service.duration} phút
                       </p>
-                        <BookingButton />
+
+                      <BookingButton />
                     </div>
-                  
                   }
                 />
               </Card>
