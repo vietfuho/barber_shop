@@ -3,13 +3,12 @@ import axios from "axios";
 
 export default function RegisterStaff() {
   const [form, setForm] = useState({
-    fullName: "",
-    email: "",
-    password: "",
+    usernameOrEmail: "",
     phone: "",
     specialty: "",
     experience: 0,
   });
+
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -22,18 +21,30 @@ export default function RegisterStaff() {
     setLoading(true);
     setMessage("");
 
+    // simple validation
+    if (!form.usernameOrEmail || !form.phone || !form.specialty) {
+      setMessage("❌ Vui lòng nhập đầy đủ thông tin");
+      setLoading(false);
+      return;
+    }
+
     try {
-      // Gửi yêu cầu đăng ký nhân viên (chưa được duyệt)
-      const res = await axios.post("http://localhost:5000/api/staff/request", form);
-      setMessage(res.data.message || "Yêu cầu đăng ký đã được gửi. Vui lòng chờ admin xác nhận.");
+      const token = localStorage.getItem("token");
+
+      await axios.post("http://localhost:5000/api/staff/request", form, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      setMessage("✅ Yêu cầu đã được gửi. Vui lòng chờ admin phê duyệt.");
+
       setForm({
-        fullName: "",
-        password: "",
+        usernameOrEmail: "",
+        phone: "",
         specialty: "",
         experience: 0,
       });
     } catch (err) {
-      setMessage(err.response?.data?.error || "Lỗi gửi yêu cầu");
+      setMessage(err.response?.data?.error || "❌ Lỗi gửi yêu cầu");
     } finally {
       setLoading(false);
     }
@@ -50,29 +61,29 @@ export default function RegisterStaff() {
         </h1>
 
         <input
-          name="fullName"
-          placeholder="Họ tên"
-          value={form.fullName}
+          name="usernameOrEmail"
+          placeholder="Username hoặc Email"
+          value={form.usernameOrEmail}
           onChange={handleChange}
           className="w-full p-3 border rounded mb-3"
         />
-        
+
         <input
-          type="password"
-          name="password"
-          placeholder="Mật khẩu"
-          value={form.password}
+          name="phone"
+          placeholder="Số điện thoại"
+          value={form.phone}
           onChange={handleChange}
           className="w-full p-3 border rounded mb-3"
         />
-        
+
         <input
           name="specialty"
-          placeholder="Chuyên môn (ví dụ: cắt tóc nam, tạo kiểu…)"
+          placeholder="Chuyên môn (ví dụ: cắt tóc, tạo kiểu…)"
           value={form.specialty}
           onChange={handleChange}
           className="w-full p-3 border rounded mb-3"
         />
+
         <input
           type="number"
           name="experience"
@@ -90,7 +101,17 @@ export default function RegisterStaff() {
           {loading ? "Đang xử lý..." : "Gửi Yêu Cầu"}
         </button>
 
-        {message && <p className="mt-4 text-center text-gray-700">{message}</p>}
+        {message && (
+          <p
+            className={`mt-4 text-center ${
+              message.startsWith("✅")
+                ? "text-green-600 font-semibold"
+                : "text-red-600 font-semibold"
+            }`}
+          >
+            {message}
+          </p>
+        )}
       </form>
     </div>
   );

@@ -22,7 +22,7 @@ import MyBookings from "./pages/MyBookings";
 import Profile from "./pages/Profile";
 import Premium from "./Components/Premium";
 import RegisterStaff from "./Components/button/RegisterStaff";
-import EditAppoin from "./pages/EditAppoin";
+import EditAppoin from "./Components/Admin/EditAppoin";
 
 // 👉 import Chatbot
 import Chatbot from "./pages/Chatbot";

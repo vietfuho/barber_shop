@@ -1,12 +1,16 @@
 import React from "react";
-import { Link, NavLink } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
 import { IoMdCut } from "react-icons/io";
 import { CgProfile } from "react-icons/cg";
 import { LuCalendarClock } from "react-icons/lu";
 
 const Navbar = ({ isLoggedIn, setIsLoggedIn }) => {
+  const navigate = useNavigate();
+
   const handleLogout = () => {
     setIsLoggedIn(false);
+    localStorage.removeItem("token"); // Xóa token
+    navigate("/login"); // Điều hướng về trang login
   };
 
   return (
@@ -15,10 +19,7 @@ const Navbar = ({ isLoggedIn, setIsLoggedIn }) => {
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <div className="flex items-center space-x-2">
-            <Link
-              to="/"
-              className="flex items-center font-bold text-[24px]"
-            >
+            <Link to="/" className="flex items-center font-bold text-[24px]">
               <IoMdCut className="text-orange-400" />
               <span className="ml-2 text-orange-400">Elite Barber</span>
             </Link>
@@ -30,59 +31,52 @@ const Navbar = ({ isLoggedIn, setIsLoggedIn }) => {
               to="/"
               end
               className={({ isActive }) =>
-                isActive
-                  ? "text-orange-500"
-                  : "text-white hover:text-orange-500"
+                isActive ? "text-orange-500" : "text-white hover:text-orange-500"
               }
             >
               Trang chủ
             </NavLink>
+
             <NavLink
               to="/about"
               className={({ isActive }) =>
-                isActive
-                  ? "text-orange-500"
-                  : "text-white hover:text-orange-500"
+                isActive ? "text-orange-500" : "text-white hover:text-orange-500"
               }
             >
               Về chúng tôi
             </NavLink>
+
             <NavLink
               to="/services"
               className={({ isActive }) =>
-                isActive
-                  ? "text-orange-500"
-                  : "text-white hover:text-orange-500"
+                isActive ? "text-orange-500" : "text-white hover:text-orange-500"
               }
             >
               Dịch vụ
             </NavLink>
+
             <NavLink
               to="/gallery"
               className={({ isActive }) =>
-                isActive
-                  ? "text-orange-500"
-                  : "text-white hover:text-orange-500"
+                isActive ? "text-orange-500" : "text-white hover:text-orange-500"
               }
             >
               Thư viện
             </NavLink>
+
             <NavLink
               to="/team"
               className={({ isActive }) =>
-                isActive
-                  ? "text-orange-500"
-                  : "text-white hover:text-orange-500"
+                isActive ? "text-orange-500" : "text-white hover:text-orange-500"
               }
             >
               Đội ngũ
             </NavLink>
+
             <NavLink
               to="/registerStaff"
               className={({ isActive }) =>
-                isActive
-                  ? "text-orange-500"
-                  : "text-white hover:text-orange-500"
+                isActive ? "text-orange-500" : "text-white hover:text-orange-500"
               }
             >
               Trở thành thợ
@@ -103,6 +97,7 @@ const Navbar = ({ isLoggedIn, setIsLoggedIn }) => {
                 >
                   Đăng nhập
                 </NavLink>
+
                 <NavLink
                   to="/register"
                   className={({ isActive }) =>
@@ -121,13 +116,10 @@ const Navbar = ({ isLoggedIn, setIsLoggedIn }) => {
                   <LuCalendarClock size={28} className="text-orange-500" />
                 </Link>
 
-                {/* Profile icon */}
-                <CgProfile
-                  size={28}
-                  className="text-orange-500 cursor-pointer"
-                />
+                {/* Profile Icon */}
+                <CgProfile size={28} className="text-orange-500 cursor-pointer" />
 
-                {/* Dropdown menu (hover) */}
+                {/* Dropdown menu */}
                 <div
                   className="hidden group-hover:block absolute right-0 top-full mt-2 w-48 
                              bg-[#171717] rounded-lg shadow-lg border border-gray-700 py-2 z-50

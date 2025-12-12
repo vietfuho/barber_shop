@@ -1,5 +1,5 @@
 const User = require("../models/user");
-
+const staffRequest = require("../models/staffRequest")
 // Tạo user mới
 exports.create = async (req, res) => {
   try {
@@ -60,4 +60,33 @@ exports.getProfile = async (req, res) => {
     } catch (err) {
         res.status(500).json({ message: err.message });
     }
+};
+
+
+
+
+// lấy ra đội ngũ nhân viên 
+exports.getAllStaffs = async (req, res) => {
+  try {
+    // Lấy danh sách user role = "staff"
+    const staffs = await User.find({ role: "staff" }).lean();
+
+    // Lấy toàn bộ staffRequest để join
+    const requests = await staffRequest.find().lean();
+
+    // JOIN thủ công
+    const result = staffs.map(staff => {
+      const req = requests.find(r => r.email === staff.email);
+
+      return {
+        ...staff,
+        specialty: req?.specialty || "Chưa cập nhật",
+        experience: req?.experience || 0
+      };
+    });
+
+    return res.json(result);
+  } catch (err) {
+    return res.status(500).json({ error: err.message });
+  }
 };

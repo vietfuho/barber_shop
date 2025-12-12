@@ -2,13 +2,14 @@ const express = require("express");
 const router = express.Router();
 const userController = require("../controller/userController");
 const verifyToken = require("../middleware/verifyToken");
-const checkRole = require("../middleware/checkRole");
+const checkRole = require("../middleware/checkrole")
 
 // Ai cũng có thể đăng ký
 router.post("/", userController.create);
 
 // Chỉ admin/staff mới xem danh sách
 router.get("/", verifyToken, checkRole(["admin","member","staff"]), userController.getAll);
+router.get("/team", verifyToken, userController.getAllStaffs);
 
 
 router.get("/profile", verifyToken, userController.getProfile);
@@ -21,6 +22,7 @@ router.put("/:id", verifyToken, userController.update);
 
 // Chỉ admin mới được xóa
 router.delete("/:id", verifyToken, checkRole("admin"), userController.remove);
+
 
 
 

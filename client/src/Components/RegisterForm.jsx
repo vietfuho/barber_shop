@@ -8,6 +8,9 @@ export default function RegisterForm() {
     email: "",
     password: "",
     confirmPassword: "",
+    address: "",
+    phone: "",
+    birthday: "",
   });
 
   const [loading, setLoading] = useState(false);
@@ -33,7 +36,10 @@ export default function RegisterForm() {
         username: formData.username,
         email: formData.email,
         password: formData.password,
-        confirmPassword: formData.confirmPassword, // GỬI LÊN SERVER
+        confirmPassword: formData.confirmPassword,
+        address: formData.address,
+        phone: formData.phone,
+        birthday: formData.birthday, // yyyy-mm-dd
       });
 
       alert(res.data.message);
@@ -54,7 +60,6 @@ export default function RegisterForm() {
           </h2>
 
           <form onSubmit={handleSubmit} className="space-y-4 text-sm">
-
             <input
               type="text"
               name="username"
@@ -95,6 +100,32 @@ export default function RegisterForm() {
               className="w-full border border-orange-300 rounded px-4 py-2"
             />
 
+            <input
+              type="text"
+              name="address"
+              placeholder="Địa chỉ"
+              value={formData.address}
+              onChange={handleChange}
+              className="w-full border border-orange-300 rounded px-4 py-2"
+            />
+
+            <input
+              type="text"
+              name="phone"
+              placeholder="Số điện thoại"
+              value={formData.phone}
+              onChange={handleChange}
+              className="w-full border border-orange-300 rounded px-4 py-2"
+            />
+
+            <input
+              type="date"
+              name="birthday"
+              value={formData.birthday}
+              onChange={handleChange}
+              className="w-full border border-orange-300 rounded px-4 py-2"
+            />
+
             <button
               type="submit"
               disabled={loading}
@@ -109,7 +140,6 @@ export default function RegisterForm() {
                 Đăng nhập ngay
               </Link>
             </p>
-
           </form>
         </div>
       </div>

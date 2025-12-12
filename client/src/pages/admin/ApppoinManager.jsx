@@ -17,19 +17,20 @@ export default function AppoinManager() {
   }, [token]);
 
   // ❌ Xóa 1 booking
-  const handleDelete = async (id) => {
-    if (!window.confirm("Bạn có chắc muốn xóa lịch hẹn này?")) return;
+   const handleCancel = async (id) => {
+    if (!window.confirm("Bạn có chắc muốn hủy lịch này?")) return;
     try {
       await axios.delete(`http://localhost:5000/api/bookings/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
+      // Xóa lịch khỏi state
       setBookings((prev) => prev.filter((b) => b._id !== id));
-      alert("Xóa lịch hẹn thành công!");
+      alert("Hủy lịch hẹn thành công");
     } catch (err) {
-      console.error("Lỗi xóa booking:", err);
+      console.error("Lỗi hủy lịch:", err);
+      alert(err.response?.data?.error || "Hủy lịch thất bại");
     }
   };
-
   // 🔎 Bộ lọc tìm kiếm
   const filteredBookings = bookings.filter((b) =>
     b.fullName?.toLowerCase().includes(searchTerm.toLowerCase())
@@ -96,11 +97,11 @@ export default function AppoinManager() {
                 </td>
                 <td className="border px-4 py-2 text-center space-x-2">
                   <button
-                    onClick={() => handleDelete(b._id)}
-                    className="bg-red-500 text-white px-3 py-1 rounded shadow hover:bg-red-600"
-                  >
-                    Xóa
-                  </button>
+                          onClick={() => handleCancel(b._id)}
+                          className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
+                        >
+                          xóa
+                        </button>
                 </td>
               </tr>
             ))

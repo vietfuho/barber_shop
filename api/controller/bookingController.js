@@ -1,12 +1,11 @@
 const Booking = require("../models/booking");
 
-
 // Tạo lịch hẹn
 exports.create = async (req, res) => {
   try {
     const { fullName, phone, email, date, note } = req.body;
 
-    // Validate dữ liệu bắt buộc
+    // Validate: kiểm tra  dữ liệu bắt buộc
     if (!fullName || !phone || !date) {
       return res.status(400).json({ error: "Thiếu thông tin bắt buộc" });
     }
@@ -66,7 +65,6 @@ exports.getOne = async (req, res) => {
 
 
 // Cập nhật lịch hẹn
-
 exports.update = async (req, res) => {
   try {
     const booking = await Booking.findByIdAndUpdate(req.params.id, req.body, { new: true });
@@ -77,9 +75,8 @@ exports.update = async (req, res) => {
   }
 };
 
-// =======================
+
 // Xóa lịch hẹn
-// =======================
 exports.remove = async (req, res) => {
   try {
     const booking = await Booking.findByIdAndDelete(req.params.id);

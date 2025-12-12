@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const bookingController = require("../controller/bookingController");
 const verifyToken = require("../middleware/verifyToken");
-const checkRole = require("../middleware/checkRole");
+const checkRole = require("../middleware/checkrole.js")
 // CRUD cho Booking
 // Tạo lịch hẹn → cần đăng nhập
 router.post("/",verifyToken, checkRole("member"), bookingController.create);  //tạo lịch hẹn nè 

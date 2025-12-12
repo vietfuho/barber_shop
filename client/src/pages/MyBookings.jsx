@@ -57,7 +57,7 @@ export default function MyBookings() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="bg-orange-50 border border-orange-300 rounded-xl shadow-md p-6">
           <h2 className="text-2xl font-bold text-orange-500 mb-6 text-center">
-            Lịch hẹn của tôi
+            Lịch hẹn 
           </h2>
 
           {loading ? (

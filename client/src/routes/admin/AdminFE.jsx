@@ -1,7 +1,7 @@
 import React from "react";
 import { Routes, Route } from "react-router-dom";
 import AdminServices from "../../pages/admin/AdminServices";
-import AddServices from "../../pages/admin/AddServices";
+import AddServices from "../../Components/Admin/AddServices";
 import EditService from "../../pages/admin/EditServices";
 import DetailsServices from "../../pages/admin/DetailsServices";
 import NavAdmin from "../../Components/Admin/NavAdmin";
@@ -32,7 +32,7 @@ const AdminFE = () => {
             <Route path="services/edit/:id" element={<EditService />} />
             <Route path="users" element={<UserMana />} />
             <Route path="bookings" element={<AppoinManager />} />
-            <Route path="bookings" element={<Aprove />} />
+            <Route path="aprove" element={<Aprove />} />
             
           </Routes>
         </main>
