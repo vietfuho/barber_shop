@@ -1,22 +1,10 @@
 const Service = require("../models/services");
 
-// =======================
 // Tạo dịch vụ mới
-// =======================
 exports.create = async (req, res) => {
   try {
-    const {
-      name,
-      description,
-      price,
-      duration,
-      imageUrl,
-      styleOptions,   // giờ chỉ là chuỗi
-      colorOptions,
-      isActive,
-    } = req.body;
+    const { name, description, price, duration, imageUrl, styleOptions, colorOptions, isActive } = req.body;
 
-    // Parse colorOptions (mảng object {label, swatch})
     let parsedColors = [];
     if (colorOptions) {
       try {
@@ -29,13 +17,13 @@ exports.create = async (req, res) => {
     const service = new Service({
       name,
       description,
-      price,
-      duration,
+      price: price ? Number(price) : 0,
+      duration: duration ? Number(duration) : 0,
       imageUrl: imageUrl || null,
       imageFile: req.file ? req.file.filename : null,
-      styleOptions, // nhận trực tiếp chuỗi
+      styleOptions: Array.isArray(styleOptions) ? styleOptions : [styleOptions],
       colorOptions: parsedColors,
-      isActive: isActive !== undefined ? isActive : true,
+      isActive: isActive !== undefined ? (isActive === "true" || isActive === true) : true,
     });
 
     await service.save();
@@ -46,9 +34,7 @@ exports.create = async (req, res) => {
   }
 };
 
-// =======================
 // Lấy tất cả dịch vụ
-// =======================
 exports.getAll = async (req, res) => {
   try {
     const services = await Service.find();
@@ -58,9 +44,7 @@ exports.getAll = async (req, res) => {
   }
 };
 
-// =======================
 // Lấy một dịch vụ theo ID
-// =======================
 exports.getOne = async (req, res) => {
   try {
     const service = await Service.findById(req.params.id);
@@ -71,19 +55,15 @@ exports.getOne = async (req, res) => {
   }
 };
 
-// =======================
 // Cập nhật dịch vụ
-// =======================
 exports.update = async (req, res) => {
   try {
     let updateData = { ...req.body };
 
-    // Nếu có file upload
     if (req.file) {
       updateData.imageFile = req.file.filename;
     }
 
-    // Parse colorOptions
     if (updateData.colorOptions) {
       try {
         updateData.colorOptions = JSON.parse(updateData.colorOptions);
@@ -94,23 +74,14 @@ exports.update = async (req, res) => {
       }
     }
 
-    // Ép kiểu
     if (updateData.price) updateData.price = Number(updateData.price);
     if (updateData.duration) updateData.duration = Number(updateData.duration);
     if (updateData.isActive !== undefined) {
-      updateData.isActive =
-        updateData.isActive === "true" || updateData.isActive === true;
+      updateData.isActive = updateData.isActive === "true" || updateData.isActive === true;
     }
 
-    const service = await Service.findByIdAndUpdate(
-      req.params.id,
-      updateData,
-      { new: true }
-    );
-    if (!service)
-      return res
-        .status(404)
-        .json({ error: "Không tìm thấy dịch vụ để cập nhật" });
+    const service = await Service.findByIdAndUpdate(req.params.id, updateData, { new: true });
+    if (!service) return res.status(404).json({ error: "Không tìm thấy dịch vụ để cập nhật" });
 
     res.json(service);
   } catch (err) {
@@ -119,9 +90,7 @@ exports.update = async (req, res) => {
   }
 };
 
-// =======================
 // Xóa dịch vụ
-// =======================
 exports.remove = async (req, res) => {
   try {
     const service = await Service.findByIdAndDelete(req.params.id);

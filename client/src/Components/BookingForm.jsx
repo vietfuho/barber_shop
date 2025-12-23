@@ -1,157 +1,172 @@
-import { useState, useMemo } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 
 export default function BookingForm() {
   const navigate = useNavigate();
+  const { state } = useLocation();
+  const service = state?.service;
+
   const [formData, setFormData] = useState({
-    fullName: "",
     phone: "",
+    email: "",
     date: "",
     time: "",
     note: "",
   });
 
-  const handleChange = (e) => {
+  if (!service) {
+    return (
+      <p className="text-center text-red-500 py-10">
+        Không có dịch vụ được chọn
+      </p>
+    );
+  }
+
+  const handleChange = (e) =>
     setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
 
-  const handleDateChange = (e) => {
-    setFormData({ ...formData, date: e.target.value, time: "" });
-  };
-
-  // ======================= Tạo time slots =======================
-  const timeOptions = useMemo(() => {
-    if (!formData.date) return [];
-    const date = new Date(formData.date + "T00:00:00");
-    const day = date.getDay(); // 0 = Chủ nhật
-    const isWeekend = day === 0 || day === 6;
-    const startHour = isWeekend ? 8 : 9;
-    const endHour = isWeekend ? 22 : 21;
-
-    const slots = [];
-    for (let h = startHour; h <= endHour; h++) {
-      for (const m of [0, 30]) {
-        if (h === endHour && m > 0) continue;
-        const hh = String(h).padStart(2, "0");
-        const mm = String(m).padStart(2, "0");
-        slots.push(`${hh}:${mm}`);
-      }
-    }
-    return slots;
-  }, [formData.date]);
-
-  // ======================= Submit form =======================
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    const token = localStorage.getItem("token");
+    if (!token) {
+      const confirmLogin = window.confirm(
+        "⚠️ Bạn cần đăng nhập trước khi đặt lịch. Bạn có muốn đăng nhập ngay?"
+      );
+      if (confirmLogin) {
+        navigate("/login");
+      }
+      return;
+    }
+
     try {
-      const token = localStorage.getItem("token");
       const res = await fetch("http://localhost:5000/api/bookings", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          ...(token && { Authorization: "Bearer " + token }),
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
-          fullName: formData.fullName,
+          serviceId: service._id,
           phone: formData.phone,
+          email: formData.email,
           date: `${formData.date}T${formData.time}:00`,
           note: formData.note,
         }),
       });
 
-      const data = await res.json();
-      if (res.ok) {
-        alert("Đặt lịch thành công!");
-        setFormData({
-          fullName: "",
-          phone: "",
-          date: "",
-          time: "",
-          note: "",
-        });
+      if (!res.ok) {
+        const err = await res.json();
+        alert("Có lỗi xảy ra: " + (err.error || "Không thể đặt lịch"));
+        return;
+      }
+
+      const goToBookings = window.confirm(
+        "🎉 Đặt lịch thành công!\n\nBạn muốn xem lịch hẹn của mình ngay bây giờ?"
+      );
+
+      if (goToBookings) {
         navigate("/mybookings");
       } else {
-        alert("Có lỗi: " + (data.error || "Không xác định"));
+        navigate("/services");
       }
-    } catch (err) {
-      console.error("Error booking:", err);
-      alert("Không thể kết nối server");
+    } catch (error) {
+      alert("Lỗi kết nối server: " + error.message);
     }
   };
 
   return (
-    <section className="py-12 bg-white">
-      <div className="max-w-md mx-auto px-3">
-        <div className="bg-white border border-orange-400 rounded-lg shadow-md p-4 md:p-6">
-          <h2 className="text-2xl font-bold text-orange-500 mb-4 text-center">
-            Đặt lịch hẹn
-          </h2>
+    <section className="py-12 bg-gray-100 min-h-screen flex items-center justify-center">
+      <div className="max-w-md w-full bg-white rounded-xl shadow-lg p-8">
+        <h2 className="text-2xl font-bold text-orange-600 mb-6 text-center">
+          Đặt lịch dịch vụ
+        </h2>
 
-          <form onSubmit={handleSubmit} className="space-y-3 text-xs text-neutral-800">
+        <form onSubmit={handleSubmit} className="space-y-5">
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-1">
+              Dịch vụ đã chọn
+            </label>
             <input
-              type="text"
-              name="fullName"
-              placeholder="Họ và tên *"
-              value={formData.fullName}
-              onChange={handleChange}
-              required
-              className="w-full border border-orange-300 rounded px-3 py-1.5 text-sm"
+              value={service.name}
+              disabled
+              className="w-full border border-gray-300 px-3 py-2 rounded-lg bg-gray-100 text-gray-600 font-medium"
             />
+          </div>
 
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-1">
+              Số điện thoại
+            </label>
             <input
-              type="tel"
               name="phone"
-              placeholder="Số điện thoại *"
-              value={formData.phone}
+              placeholder="Nhập số điện thoại"
               onChange={handleChange}
               required
-              className="w-full border border-orange-300 rounded px-3 py-1.5 text-sm"
+              className="w-full border border-gray-300 px-3 py-2 rounded-lg focus:ring-2 focus:ring-orange-500"
             />
+          </div>
 
-            <div className="grid grid-cols-2 gap-3">
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-1">
+              Email
+            </label>
+            <input
+              type="email"
+              name="email"
+              placeholder="Nhập email"
+              onChange={handleChange}
+              className="w-full border border-gray-300 px-3 py-2 rounded-lg focus:ring-2 focus:ring-orange-500"
+            />
+          </div>
+
+          <div className="flex gap-4">
+            <div className="flex-1">
+              <label className="block text-sm font-semibold text-gray-700 mb-1">
+                Ngày
+              </label>
               <input
                 type="date"
                 name="date"
-                value={formData.date}
-                onChange={handleDateChange}
-                required
-                className="w-full border border-orange-300 rounded px-3 py-1.5 text-sm"
-              />
-              <select
-                name="time"
-                value={formData.time}
                 onChange={handleChange}
                 required
-                disabled={!formData.date}
-                className="w-full border border-orange-300 rounded px-3 py-1.5 text-sm disabled:bg-gray-100 disabled:text-gray-400"
-              >
-                <option value="">
-                  {formData.date ? "Chọn giờ" : "Chọn ngày trước"}
-                </option>
-                {timeOptions.map((t) => (
-                  <option key={t} value={t}>{t}</option>
-                ))}
-              </select>
+                className="w-full border border-gray-300 px-3 py-2 rounded-lg focus:ring-2 focus:ring-orange-500"
+              />
             </div>
 
+            <div className="flex-1">
+              <label className="block text-sm font-semibold text-gray-700 mb-1">
+                Giờ
+              </label>
+              <input
+                type="time"
+                name="time"
+                onChange={handleChange}
+                required
+                className="w-full border border-gray-300 px-3 py-2 rounded-lg focus:ring-2 focus:ring-orange-500"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-1">
+              Ghi chú
+            </label>
             <textarea
               name="note"
-              value={formData.note}
+              placeholder="Thêm ghi chú nếu cần..."
               onChange={handleChange}
-              rows="2"
-              placeholder="Ghi chú thêm..."
-              className="w-full border border-orange-300 rounded px-3 py-1.5 text-sm resize-none"
+              className="w-full border border-gray-300 px-3 py-2 rounded-lg focus:ring-2 focus:ring-orange-500"
             />
+          </div>
 
-            <button
-              type="submit"
-              className="w-full bg-orange-500 hover:bg-orange-600 text-white py-1.5 rounded font-semibold text-sm transition"
-            >
-              Xác nhận đặt lịch
-            </button>
-          </form>
-        </div>
+          <button
+            type="submit"
+            className="w-full bg-orange-500 text-white py-3 rounded-lg font-semibold hover:bg-orange-600 transition shadow-md"
+          >
+            Xác nhận đặt lịch
+          </button>
+        </form>
       </div>
     </section>
   );

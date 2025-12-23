@@ -9,10 +9,6 @@ import About from "./pages/About";
 import Team from "./pages/Team";
 import ServicesPrice from "./pages/Services&Pricing";
 import Gallery from "./pages/Gallery";
-
-import Contact from "./pages/Contact";
-import Booking from "./pages/Booking";
-import Shop from "./pages/Shop";
 import LoginForm from "./Components/LoginForm";
 import RegisterForm from "./Components/RegisterForm";
 
@@ -26,9 +22,15 @@ import EditAppoin from "./Components/Admin/EditAppoin";
 
 // 👉 import Chatbot
 import Chatbot from "./pages/Chatbot";
+import BookingForm from "./Components/BookingForm";
+import ResetPass from "./pages/ResetPass";
 
 function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  // Khởi tạo trạng thái đăng nhập từ localStorage để giữ sau F5
+  const [isLoggedIn, setIsLoggedIn] = useState(() => {
+    return !!localStorage.getItem("token");
+  });
+
   const location = useLocation();
   const isAdminRoute = location.pathname.startsWith("/admin");
 
@@ -48,16 +50,15 @@ function App() {
           <Route path="/services" element={<ServicesPrice />} />
           <Route path="/gallery" element={<Gallery />} />
           <Route path="/team" element={<Team />} />
-
-          <Route path="/contact" element={<Contact />} />
-          <Route path="/booking" element={<Booking />} />
-          <Route path="/shop" element={<Shop />} />
+          
+          <Route path="/booking" element={<BookingForm />} />
           <Route path="/services/details/:id" element={<DetailsFe />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/premium" element={<Premium />} />
           <Route path="/registerStaff" element={<RegisterStaff />} />
           <Route path="/edit-appoint/:id" element={<EditAppoin />} />
-
+          <Route path="/resetPass" element={<ResetPass />} />
+         
           {/* Auth routes */}
           <Route
             path="/login"

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import defautAva from "../assets/image/defautAva.png"
+import defautAva from "../assets/image/defautAva.png";
+
 export default function Team() {
   const [team, setTeam] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -32,51 +33,87 @@ export default function Team() {
   }, []);
 
   return (
-    <div className="bg-white py-16 px-4 max-w-6xl mx-auto">
-      <h2 className="text-3xl font-bold text-center text-orange-500 mb-10">
-        Gặp gỡ đội ngũ của chúng tôi
-      </h2>
+    <section className="py-24 px-4
+      bg-gradient-to-b from-orange-50 via-amber-50 to-white">
+      
+      <div className="max-w-6xl mx-auto">
+        {/* Title */}
+        <h2 className="text-4xl font-extrabold text-center text-orange-600 mb-3">
+          Đội ngũ của chúng tôi
+        </h2>
+        <p className="text-center text-gray-600 mb-14">
+          Những người thợ chuyên nghiệp – tận tâm – giàu kinh nghiệm
+        </p>
 
-      {loading ? (
-        <p className="text-center text-gray-500">Đang tải...</p>
-      ) : team.length === 0 ? (
-        <p className="text-center text-gray-500">Chưa có nhân viên nào.</p>
-      ) : (
-        <div className="grid md:grid-cols-3 sm:grid-cols-2 grid-cols-1 gap-8">
-          {team.map((member) => (
-            <div
-              key={member._id}
-              className="bg-white shadow-lg rounded-xl p-6 text-center hover:shadow-2xl hover:-translate-y-1 transition"
-            >
-              <img
-                src={defautAva}
-                className="w-32 h-32 rounded-full mx-auto object-cover border-4 border-orange-500"
-                alt=""
-              />
+        {loading ? (
+          <p className="text-center text-gray-500">Đang tải dữ liệu...</p>
+        ) : team.length === 0 ? (
+          <p className="text-center text-gray-500">
+            Chưa có nhân viên nào.
+          </p>
+        ) : (
+          <div className="grid md:grid-cols-3 sm:grid-cols-2 grid-cols-1 gap-10">
+            {team.map((member) => (
+              <div
+                key={member._id}
+                className="bg-white rounded-2xl p-8 text-center
+                  border border-orange-100
+                  shadow-md hover:shadow-xl
+                  hover:-translate-y-1 transition-all duration-300"
+              >
+                {/* Avatar */}
+                <div className="relative w-32 h-32 mx-auto mb-5">
+                  <img
+                    src={member.avatar || defautAva}
+                    alt="avatar"
+                    className="w-full h-full rounded-full object-cover
+                      border-4 border-orange-400
+                      shadow-sm"
+                  />
+                  {/* Role badge */}
+                  <span className="absolute -bottom-3 left-1/2 -translate-x-1/2
+                    px-4 py-1 bg-orange-500 text-white
+                    text-xs font-semibold rounded-full shadow">
+                    {member.role?.toUpperCase() || "STAFF"}
+                  </span>
+                </div>
 
-              <h3 className="text-xl font-semibold text-gray-900 mt-4">
-                {member.username || "Không có tên"}
-              </h3>
+                {/* Name */}
+                <h3 className="text-xl font-semibold text-gray-800 mt-6">
+                  {member.username || "Không có tên"}
+                </h3>
 
-              <p className="text-gray-600 mt-2">
-                <span className="font-semibold">Ngành nghề: </span>
-                {member.specialty || "Chưa cập nhật"}
-              </p>
-
-              <p className="text-gray-600 mt-1">
-                <span className="font-semibold">Kinh nghiệm: </span>
-                {member.experience ?? 0} năm
-              </p>
-
-              <div className="mt-4">
-                <span className="px-3 py-1 bg-orange-100 text-orange-600 rounded-full text-sm font-medium">
-                  {member.role?.toUpperCase() || "STAFF"}
-                </span>
+                {/* Info */}
+                <div className="mt-4 space-y-1 text-sm text-gray-600">
+                  <p>
+                    <span className="font-medium text-gray-700">Email:</span>{" "}
+                    {member.email || "Chưa cập nhật"}
+                  </p>
+                  <p>
+                    <span className="font-medium text-gray-700">SĐT:</span>{" "}
+                    {member.phone || "Chưa cập nhật"}
+                  </p>
+                  <p>
+                    <span className="font-medium text-gray-700">Chuyên môn:</span>{" "}
+                    {member.specialty || "Chưa cập nhật"}
+                  </p>
+                  <p>
+                    <span className="font-medium text-gray-700">Địa chỉ:</span>{" "}
+                    {member.address || "Chưa cập nhật"}
+                  </p>
+                  
+                  <p>
+                    <span className="font-medium text-gray-700">Kinh nghiệm:</span>{" "}
+                    {member.experience ?? 0} năm
+                  </p>
+                  
+                  
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </section>
   );
 }

@@ -1,29 +1,30 @@
-const express = require("express");
-const router = express.Router();
-const userController = require("../controller/userController");
-const verifyToken = require("../middleware/verifyToken");
-const checkRole = require("../middleware/checkrole")
+    const express = require("express");
+    const router = express.Router();
+    const userController = require("../controller/userController");
+    const verifyToken = require("../middleware/verifyToken");
+    const checkRole = require("../middleware/checkrole");
 
-// Ai cũng có thể đăng ký
-router.post("/", userController.create);
+    // Đăng ký user mới
+    router.post("/", userController.create);
 
-// Chỉ admin/staff mới xem danh sách
-router.get("/", verifyToken, checkRole(["admin","member","staff"]), userController.getAll);
-router.get("/team", verifyToken, userController.getAllStaffs);
+    // Lấy danh sách user → chỉ admin/staff
+    router.get("/", verifyToken, checkRole(["admin", "staff"]), userController.getAll);
 
+    // Lấy danh sách staff
+    router.get("/team", verifyToken, userController.getAllStaffs);
 
-router.get("/profile", verifyToken, userController.getProfile);
+    // Lấy profile của user hiện tại
+    router.get("/profile", verifyToken, userController.getProfile);
 
-// Chỉ user đã đăng nhập mới xem chi tiết
-router.get("/:id", verifyToken, userController.getOne);
+    // Lấy chi tiết user theo id
+    router.get("/:id", verifyToken, userController.getOne);
 
-// Chỉ user đã đăng nhập mới cập nhật
-router.put("/:id", verifyToken, userController.update);
+    // Cập nhật user
+    router.put("/:id", verifyToken, userController.update);
 
-// Chỉ admin mới được xóa
-router.delete("/:id", verifyToken, checkRole("admin"), userController.remove);
+    // Xóa user → chỉ admin
+    router.delete("/:id", verifyToken, checkRole("admin"), userController.remove);
 
+   
 
-
-
-module.exports = router;
+    module.exports = router;

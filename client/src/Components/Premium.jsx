@@ -1,9 +1,10 @@
-import React from 'react'
+import React from 'react';
 import BookingButton from '../Components/button/BookingButton';
+
 const Premium = () => {
   return (
     <div>
-        {/* Gói dịch vụ combo */}
+      {/* Gói dịch vụ combo */}
       <section className="bg-gray-100 py-20 px-4">
         <div className="max-w-6xl mx-auto text-center mb-12">
           <h2 className="text-4xl font-bold text-orange-600 mb-4">
@@ -62,8 +63,8 @@ const Premium = () => {
           </div>
         </div>
       </section>
-      </div>
-  )
-}
+    </div>
+  );
+};
 
-export default Premium
+export default Premium;

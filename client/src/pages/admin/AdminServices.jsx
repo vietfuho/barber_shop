@@ -28,14 +28,23 @@ export default function AdminServices() {
   };
 
   const filteredServices = services.filter((s) => {
-    const term = searchTerm.toLowerCase();
-    return (
-      (s.name?.toLowerCase() || "").includes(term) ||
-      (s.styleOptions?.toLowerCase() || "").includes(term) ||
-      (s.colorOptions?.map((c) => c.label.toLowerCase()).join(" ") || "").includes(term)
-    );
-  });
+  const term = searchTerm.toLowerCase();
 
+  const nameMatch = (s.name || "").toLowerCase().includes(term);
+
+  const styleMatch = Array.isArray(s.styleOptions)
+    ? s.styleOptions.join(" ").toLowerCase().includes(term)
+    : (s.styleOptions || "").toLowerCase().includes(term);
+
+  const colorMatch = Array.isArray(s.colorOptions)
+    ? s.colorOptions
+        .map((c) => (c.label ? c.label.toLowerCase() : ""))
+        .join(" ")
+        .includes(term)
+    : "";
+
+  return nameMatch || styleMatch || colorMatch;
+});
   return (
     <div className="p-6">
       <div className="flex justify-between items-center mb-4">
@@ -63,7 +72,7 @@ export default function AdminServices() {
         </div>
       </div>
 
-      <table className="w-full border-collapse rounded-lg overflow-hidden shadow-lg">
+      <table className="w-80% border-collapse rounded-lg overflow-hidden shadow-lg">
         <thead className="bg-orange-500 text-white">
           <tr>
             <th className="px-4 py-2">STT</th>

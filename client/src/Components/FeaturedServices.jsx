@@ -1,9 +1,20 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { services } from "../data/seeds"; // dữ liệu mẫu
 import BookingButton from "./button/BookingButton";
 
 export default function FeaturedServices() {
+  const navigate = useNavigate();
+
+  const handleBookingClick = () => {
+    const confirmService = window.confirm(
+      "⚠️ Bạn cần chọn dịch vụ trước khi đặt lịch. Nhấn OK để chuyển đến trang dịch vụ."
+    );
+    if (confirmService) {
+      navigate("/services");
+    }
+  };
+
   return (
     <section className="bg-white mt-5">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -46,18 +57,17 @@ export default function FeaturedServices() {
 
       {/* Banner CTA */}
       <section className="mt-20 bg-black text-white py-16 px-6 text-center">
-  <h2 className="text-3xl md:text-4xl font-bold mb-4">
-    Sẵn sàng thay đổi diện mạo?
-  </h2>
-  <p className="text-lg text-neutral-300 mb-6">
-    Đặt lịch ngay hôm nay để trải nghiệm dịch vụ đẳng cấp
-  </p>
+        <h2 className="text-3xl md:text-4xl font-bold mb-4">
+          Sẵn sàng thay đổi diện mạo?
+        </h2>
+        <p className="text-lg text-neutral-300 mb-6">
+          Đặt lịch ngay hôm nay để trải nghiệm dịch vụ đẳng cấp
+        </p>
 
-  <div className="flex justify-center">
-    <BookingButton />
-  </div>
-</section>
-
+        <div className="flex justify-center" onClick={handleBookingClick}>
+          <BookingButton />
+        </div>
+      </section>
     </section>
   );
 }

@@ -1,65 +1,41 @@
-const bcrypt = require("bcrypt");
 const User = require("../models/user");
-const StaffRequest = require("../models/staffRequest")
-// controllers/staffController.js (hoặc file tương ứng)
+const StaffRequest = require("../models/staffRequest");
 
-
+// Phê duyệt yêu cầu trở thành staff
 exports.approveRequest = async (req, res) => {
   try {
     const requestId = req.params.id;
 
-    // 1. Lấy request nhân viên
+    // Lấy yêu cầu theo id
     const request = await StaffRequest.findById(requestId);
     if (!request) {
       return res.status(404).json({ message: "Không tìm thấy yêu cầu" });
     }
 
-    // 2. Chuẩn hóa username/email để tìm user
-    const identifier = request.usernameOrEmail || request.email;
-    if (!identifier) {
-      return res.status(400).json({ message: "Yêu cầu thiếu thông tin username/email" });
-    }
-
-    // 3. Tìm user theo email hoặc username
-    const user = await User.findOne({
-      $or: [{ email: identifier }, { username: identifier }]
-    });
-
+    // Lấy user theo userId trong request
+    const user = await User.findById(request.userId);
     if (!user) {
-      return res.status(400).json({ message: "Không tìm thấy user để phê duyệt" });
+      return res.status(404).json({ message: "Không tìm thấy user" });
     }
 
-    // 4. GÁN TRỰC TIẾP (không hash phone nữa)
-    if (request.phone) {
-      user.phone = request.phone;   // ← Không hash, không hardcode
-    }
-
-    if (request.specialty) {
-      user.specialty = request.specialty;
-    }
-
-    if (request.experience) {
-      user.experience = request.experience;
-    }
-
-    // 5. Chuyển quyền
+    // Chuyển role từ member thành staff
     user.role = "staff";
-
     await user.save();
 
-    // 6. Xóa request sau khi phê duyệt
+    // Xóa yêu cầu sau khi phê duyệt
     await StaffRequest.findByIdAndDelete(requestId);
 
-    return res.json({ message: "Phê duyệt thành công", staff: user });
-
+    return res.json({
+      message: "Phê duyệt thành công, user đã trở thành staff",
+      staff: user
+    });
   } catch (error) {
-    console.error("approveRequest error:", error);
-    return res.status(500).json({ error: error.message || "Lỗi máy chủ" });
+    return res.status(500).json({ error: error.message });
   }
 };
 
 
-
+// Từ chối yêu cầu
 exports.rejectRequest = async (req, res) => {
   try {
     const updated = await StaffRequest.findByIdAndUpdate(
@@ -67,12 +43,14 @@ exports.rejectRequest = async (req, res) => {
       { status: "rejected" },
       { new: true }
     );
+    if (!updated) return res.status(404).json({ message: "Không tìm thấy yêu cầu" });
     res.json(updated);
   } catch (err) {
     res.status(500).json({ message: "Lỗi từ chối" });
   }
 };
 
+// Lấy tất cả yêu cầu
 exports.GetAll = async (req, res) => {
   try {
     const requests = await StaffRequest.find();

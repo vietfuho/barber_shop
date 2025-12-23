@@ -1,123 +1,142 @@
-import { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
+import Calendar from "react-calendar";
+import "react-calendar/dist/Calendar.css";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
-export default function MyBookings() {
+const MyBookings = () => {
   const [bookings, setBookings] = useState([]);
+  const [selectedDate, setSelectedDate] = useState(new Date());
   const [loading, setLoading] = useState(true);
   const token = localStorage.getItem("token");
-  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchBookings = async () => {
-      if (!token) {
-        setLoading(false);
-        return;
-      }
-
       try {
-        const payload = JSON.parse(atob(token.split(".")[1]));
-        const currentUserId = payload.id;
-
         const res = await axios.get("http://localhost:5000/api/bookings", {
           headers: { Authorization: `Bearer ${token}` },
         });
-
-        const myBookings = res.data.filter((b) => b.userId === currentUserId);
-        setBookings(myBookings);
+        setBookings(res.data);
       } catch (err) {
-        console.error("Lỗi lấy lịch hẹn:", err);
+        console.error("Lỗi lấy lịch:", err);
       } finally {
         setLoading(false);
       }
     };
-
     fetchBookings();
   }, [token]);
 
-  // ✅ Hàm hủy lịch
-  const handleCancel = async (id) => {
-    if (!window.confirm("Bạn có chắc muốn hủy lịch này?")) return;
-    try {
-      await axios.delete(`http://localhost:5000/api/bookings/${id}`, {
-        headers: { Authorization: `Bearer ${token}` },
+  const bookingsInDay = bookings.filter((b) => {
+    const d = new Date(b.date);
+    return (
+      d.getDate() === selectedDate.getDate() &&
+      d.getMonth() === selectedDate.getMonth() &&
+      d.getFullYear() === selectedDate.getFullYear()
+    );
+  });
+
+  const tileContent = ({ date, view }) => {
+    if (view === "month") {
+      const hasBooking = bookings.some((b) => {
+        const d = new Date(b.date);
+        return (
+          d.getDate() === date.getDate() &&
+          d.getMonth() === date.getMonth() &&
+          d.getFullYear() === date.getFullYear()
+        );
       });
-      // Xóa lịch khỏi state
-      setBookings((prev) => prev.filter((b) => b._id !== id));
-      alert("Hủy lịch hẹn thành công");
-    } catch (err) {
-      console.error("Lỗi hủy lịch:", err);
-      alert(err.response?.data?.error || "Hủy lịch thất bại");
+
+      if (hasBooking) {
+        return (
+          <div className="flex justify-center">
+            <span className="w-2 h-2 bg-orange-500 rounded-full mt-1"></span>
+          </div>
+        );
+      }
     }
+    return null;
   };
 
-  return (
-    <section className="py-16 bg-white">
-      {/* dùng layout giống Navbar/Footer */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="bg-orange-50 border border-orange-300 rounded-xl shadow-md p-6">
-          <h2 className="text-2xl font-bold text-orange-500 mb-6 text-center">
-            Lịch hẹn 
-          </h2>
+  if (loading) {
+    return <p className="text-center py-10">Đang tải lịch...</p>;
+  }
 
-          {loading ? (
-            <p className="text-center text-gray-500">Đang tải dữ liệu...</p>
-          ) : bookings.length === 0 ? (
-            <p className="text-center text-gray-500">Bạn chưa có lịch hẹn nào.</p>
+  return (
+    <section className="py-12 bg-gray-100 min-h-screen flex justify-center">
+      <div className="w-full max-w-5xl bg-white rounded-2xl shadow-xl p-8">
+        <h2 className="text-2xl font-bold text-orange-600 text-center mb-8">
+          📅 Lịch hẹn của tôi
+        </h2>
+
+        {/* LỊCH */}
+        <div className="flex justify-center">
+          <Calendar
+            onChange={setSelectedDate}
+            value={selectedDate}
+            locale="vi-VN"
+            tileContent={tileContent}
+            className="
+              w-full 
+              rounded-xl 
+              border 
+              p-4 
+              text-lg
+              [&_.react-calendar__tile]:h-20
+              [&_.react-calendar__tile]:flex
+              [&_.react-calendar__tile]:flex-col
+              [&_.react-calendar__tile]:justify-center
+            "
+          />
+        </div>
+
+        {/* DANH SÁCH TRONG NGÀY */}
+        <div className="mt-10">
+          <h3 className="font-semibold text-xl mb-4 text-center">
+            Lịch ngày {selectedDate.toLocaleDateString("vi-VN")}
+          </h3>
+
+          {bookingsInDay.length === 0 ? (
+            <p className="text-gray-500 italic text-center">
+              Không có lịch hẹn
+            </p>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm border-collapse">
-                <thead className="bg-orange-500 text-white">
-                  <tr>
-                    <th className="px-4 py-2">STT</th>
-                    <th className="px-4 py-2">Họ và tên</th>
-                    <th className="px-4 py-2">Số điện thoại</th>
-                    <th className="px-4 py-2">Ngày hẹn</th>
-                    <th className="px-4 py-2">Ghi chú</th>
-                    <th className="px-4 py-2">Ngày tạo</th>
-                    <th className="px-4 py-2">Thao tác</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {bookings.map((b, index) => (
-                    <tr
-                      key={b._id}
-                      className="text-center border-b hover:bg-orange-100"
+            <div className="space-y-4 max-w-3xl mx-auto">
+              {bookingsInDay.map((booking) => {
+                const timeStr = new Date(booking.date).toLocaleTimeString(
+                  "vi-VN",
+                  { hour: "2-digit", minute: "2-digit" }
+                );
+
+                return (
+                  <div
+                    key={booking._id}
+                    className="border rounded-xl p-4 flex justify-between items-center hover:shadow-md transition"
+                  >
+                    <div>
+                      <p className="font-semibold text-gray-800">
+                        {booking.serviceId?.name}
+                      </p>
+                      <p className="text-sm text-gray-600">⏰ {timeStr}</p>
+                      <p className="text-sm text-gray-600">
+                        📞 {booking.phone}
+                      </p>
+                    </div>
+
+                    <Link
+                      to={`/edit-appoint/${booking._id}`}
+                      className="px-4 py-2 bg-orange-500 text-white rounded-lg font-semibold hover:bg-orange-600 transition"
                     >
-                      <td className="px-4 py-2">{index + 1}</td>
-                      <td className="px-4 py-2">{b.fullName}</td>
-                      <td className="px-4 py-2">{b.phone}</td>
-                      <td className="px-4 py-2">
-                        {b.date ? new Date(b.date).toLocaleString() : "-"}
-                      </td>
-                      <td className="px-4 py-2">{b.note || "Không có"}</td>
-                      <td className="px-4 py-2">
-                        {b.createdAt
-                          ? new Date(b.createdAt).toLocaleString()
-                          : "-"}
-                      </td>
-                      <td className="px-4 py-2 space-x-2">
-                        <button
-                          onClick={() => navigate(`/edit-appoint/${b._id}`)}
-                          className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
-                        >
-                          Sửa
-                        </button>
-                        <button
-                          onClick={() => handleCancel(b._id)}
-                          className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
-                        >
-                          Hủy
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+                      Sửa
+                    </Link>
+                  </div>
+                );
+              })}
             </div>
           )}
         </div>
       </div>
     </section>
   );
-}
+};
+
+export default MyBookings;

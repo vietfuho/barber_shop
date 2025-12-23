@@ -1,13 +1,12 @@
 import React, { useEffect, useState, useRef } from "react";
-import { Card, Row, Col, Tag } from "antd";
-import BookingButton from "./button/BookingButton";
-
-const { Meta } = Card;
+import { useNavigate } from "react-router-dom";
 
 const ServiceCard = () => {
   const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [expanded, setExpanded] = useState({});
   const fetchedRef = useRef(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchServices = async () => {
@@ -30,117 +29,168 @@ const ServiceCard = () => {
 
   if (loading) return <div className="p-10 text-xl">Đang tải dịch vụ...</div>;
   if (services.length === 0)
-    return <div className="p-10 text-xl text-red-500">Không có dịch vụ nào</div>;
+    return (
+      <div className="p-10 text-xl text-red-500">
+        Không có dịch vụ nào
+      </div>
+    );
 
   return (
-    <div style={{ padding: "20px" }}>
-      <Row gutter={[24, 24]}>
+    <div className="p-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 auto-rows-fr">
         {services.map((service) => {
-          const imageSrc = (() => {
-            if (service.imageUrl) {
-              return service.imageUrl.startsWith("http")
-                ? service.imageUrl
-                : `http://localhost:5000/${service.imageUrl}`;
-            }
-            if (service.imageFile) {
-              return `http://localhost:5000/uploads/${service.imageFile}`;
-            }
-            return null;
-          })();
+          const imageSrc = service.imageUrl
+            ? service.imageUrl.startsWith("http")
+              ? service.imageUrl
+              : `http://localhost:5000/${service.imageUrl}`
+            : service.imageFile
+            ? `http://localhost:5000/uploads/${service.imageFile}`
+            : null;
 
           return (
-            <Col span={8} key={service._id}>
-              <Card
-                hoverable
-                cover={
-                  imageSrc ? (
-                    <img
-                      src={imageSrc}
-                      alt={service.name}
-                      style={{
-                        height: "200px",
-                        objectFit: "cover",
-                        borderRadius: "8px 8px 0 0",
-                      }}
-                      onError={(e) => {
-                        e.target.onerror = null;
-                        e.target.src = "/fallback-image.jpg"; // ảnh mặc định nếu lỗi
-                      }}
-                    />
-                  ) : (
-                    <div
-                      style={{
-                        height: "200px",
-                        backgroundColor: "#f0f0f0",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        borderRadius: "8px 8px 0 0",
-                        color: "#888",
-                      }}
+            <div
+              key={service._id}
+              className="bg-white rounded-xl shadow-md hover:shadow-lg transition flex flex-col h-full overflow-hidden"
+            >
+              {/* Ảnh */}
+              <div className="w-full h-52 bg-gray-200 flex-shrink-0">
+                {imageSrc ? (
+                  <img
+                    src={imageSrc}
+                    alt={service.name}
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      e.target.onerror = null;
+                      e.target.src = "/fallback-image.jpg";
+                    }}
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-gray-500">
+                    Không có ảnh
+                  </div>
+                )}
+              </div>
+
+              {/* Nội dung */}
+              <div className="p-4 flex flex-col flex-1">
+                {/* Tên */}
+                <h2 className="text-lg font-bold text-gray-800 min-h-[28px]">
+                  {service.name || " "}
+                </h2>
+
+                {/* Mô tả */}
+                <div className="mt-2 min-h-[48px]">
+                  {service.description ? (
+                    <p
+                      className={`text-gray-600 ${
+                        expanded[service._id] ? "" : "line-clamp-2"
+                      }`}
                     >
-                      Không có ảnh
-                    </div>
-                  )
-                }
-              >
-                <Meta
-                  title={service.name}
-                  description={
-                    <div>
-                      <p style={{ marginTop: 10 }}>{service.description}</p>
+                      {service.description}
+                    </p>
+                  ) : (
+                    <p className="invisible">placeholder</p>
+                  )}
+                </div>
 
-                      {service.styleOptions && (
-                        <p style={{ marginTop: 8, fontSize: 13, color: "#555" }}>
-                          Kiểu tóc: {service.styleOptions}
-                        </p>
-                      )}
+                {service.description?.length > 60 && (
+                  <button
+                    onClick={() =>
+                      setExpanded((prev) => ({
+                        ...prev,
+                        [service._id]: !prev[service._id],
+                      }))
+                    }
+                    className="text-sm text-blue-500 mt-1 hover:underline self-start"
+                  >
+                    {expanded[service._id] ? "Ẩn bớt" : "Xem thêm"}
+                  </button>
+                )}
 
-                      {service.colorOptions?.length > 0 && (
-                        <div style={{ marginTop: 10 }}>
-                          <p style={{ fontSize: 13, marginBottom: 5 }}>
-                            Màu nhuộm:
-                          </p>
-                          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-                            {service.colorOptions.map((color, idx) => (
-                              <Tag
-                                key={idx}
-                                color={color.swatch || "gray"}
-                                style={{
-                                  padding: "3px 10px",
-                                  borderRadius: "5px",
-                                }}
-                              >
-                                {color.label}
-                              </Tag>
-                            ))}
-                          </div>
-                        </div>
-                      )}
+                {/* Kiểu tóc */}
+                <div className="mt-2 min-h-[20px]">
+                  {service.styleOptions ? (
+                    <p className="text-sm text-gray-500">
+                      Kiểu tóc: {service.styleOptions}
+                    </p>
+                  ) : (
+                    <p className="invisible">placeholder</p>
+                  )}
+                </div>
 
-                      <p
-                        style={{
-                          marginTop: 12,
-                          fontWeight: "bold",
-                          color: "orange",
-                        }}
-                      >
-                        Giá: {service.price?.toLocaleString()} VNĐ
+                {/* Màu nhuộm */}
+                <div className="mt-2 min-h-[56px]">
+                  {service.colorOptions?.length > 0 ? (
+                    <>
+                      <p className="text-sm text-gray-500 mb-1">
+                        Màu nhuộm:
                       </p>
+                      <div className="flex flex-wrap gap-2">
+                        {service.colorOptions.map((color, idx) => (
+                          <span
+                            key={idx}
+                            className="px-3 py-1 rounded-md text-sm font-medium text-white"
+                            style={{
+                              backgroundColor: color.swatch || "#999",
+                            }}
+                          >
+                            {color.label}
+                          </span>
+                        ))}
+                      </div>
+                    </>
+                  ) : (
+                    <div className="invisible">placeholder</div>
+                  )}
+                </div>
 
-                      <p style={{ color: "#888", fontSize: 13 }}>
-                        Thời gian: {service.duration} phút
-                      </p>
+                {/* Giá + thời gian */}
+                <div className="mt-3 min-h-[40px]">
+                  <p className="font-semibold text-orange-600">
+                    Giá:{" "}
+                    {service.price
+                      ? service.price.toLocaleString()
+                      : "—"}{" "}
+                    VNĐ
+                  </p>
+                  <p className="text-sm text-gray-500">
+                    Thời gian: {service.duration || "—"} phút
+                  </p>
+                </div>
 
-                      <BookingButton />
-                    </div>
-                  }
-                />
-              </Card>
-            </Col>
+                {/* Nút hành động */}
+                <div className="mt-auto pt-4 flex justify-between items-center">
+                  <button
+                    onClick={() =>
+                      navigate(`/services/details/${service._id}`)
+                    }
+                    className="text-gray-500 hover:text-gray-700 transition font-medium"
+                  >
+                    Xem chi tiết →
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      const token = localStorage.getItem("token");
+                      if (!token) {
+                        const confirmLogin = window.confirm(
+                          "⚠️ Bạn cần đăng nhập trước khi đặt lịch. Bạn có muốn đăng nhập ngay?"
+                        );
+                        if (confirmLogin) navigate("/login");
+                        return;
+                      }
+                      navigate("/booking", { state: { service } });
+                    }}
+                    className="bg-orange-600 hover:bg-amber-600 text-white px-6 py-3 rounded-full text-sm font-semibold transition"
+                  >
+                    Đặt lịch
+                  </button>
+                </div>
+              </div>
+            </div>
           );
         })}
-      </Row>
+      </div>
     </div>
   );
 };

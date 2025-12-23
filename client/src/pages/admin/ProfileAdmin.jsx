@@ -1,0 +1,120 @@
+import React, { useEffect, useState } from "react";
+import defautAva from "../../assets/image/defautAva.png";
+
+const ProfileAdmin = () => {
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [editing, setEditing] = useState(false);
+  const [previewAvatar, setPreviewAvatar] = useState("");
+  const [formData, setFormData] = useState({ username: "", email: "", phone: "", address: "", avatar: "", role: "" });
+
+  useEffect(() => {
+    const fetchMe = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) { setLoading(false); return; }
+        const res = await fetch("http://localhost:5000/api/users/profile", { headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` } });
+        const data = await res.json();
+        setUser(data);
+        setFormData({ username: data.username || "", email: data.email || "", phone: data.phone || "", address: data.address || "", avatar: data.avatar || "", role: data.role || "" });
+      } catch (err) { 
+        console.log("Lỗi getMe:", err);
+       } finally { setLoading(false); }
+    };
+    fetchMe();
+  }, []);
+
+  const handleChange = e => setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
+  const handleAvatarChange = e => { const file = e.target.files[0]; if (file) { const reader = new FileReader(); reader.onloadend = () => { setPreviewAvatar(reader.result); setFormData(prev => ({ ...prev, avatar: reader.result })); }; reader.readAsDataURL(file); } };
+  const handleSubmit = async e => { 
+    e.preventDefault(); try { 
+      const token = localStorage.getItem("token"); 
+      const res = await fetch(`http://localhost:5000/api/users/${user._id}`, 
+        { method: "PUT", headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+         body: JSON.stringify(formData) }); const updatedUser = await res.json(); setUser(updatedUser); 
+         alert("Cập nhật thành công!"); 
+         setEditing(false); setPreviewAvatar("");
+         } catch (err) {
+          console.log(err);
+          
+     alert("Cập nhật thất bại!");
+     } };
+
+  if (loading) return <div className="p-10 text-xl">Đang tải...</div>;
+  if (!user) return <div className="p-10 text-xl text-red-500">Không tìm thấy user</div>;
+ if (user.role !== "admin") return (
+  <div className="min-h-screen flex items-center justify-center bg-gray-100">
+    <div className="bg-white p-8 rounded-lg shadow text-center">
+      <h1 className="text-2xl font-bold text-red-600 mb-4">❌ Bạn không có quyền truy cập</h1>
+      <p className="text-gray-600 mb-6">Chỉ <span className="font-semibold">admin</span> mới được phép vào trang quản trị.</p>
+      <button
+        onClick={() => {
+          if (window.confirm("Bạn có chắc chắn muốn thoát?")) {
+            localStorage.removeItem("token");
+            window.location.href = "/login";
+          }
+        }}
+        className="px-6 py-3 bg-red-600 hover:bg-red-700 text-white font-bold rounded-lg"
+      >
+        Thoát
+      </button>
+    </div>
+  </div>
+);
+  return (
+    <div className="min-h-screen bg-gray-100 flex">
+      <div className="w-72 bg-black text-white flex flex-col fixed h-full shadow-xl">
+        <div className="p-8 text-center border-b border-gray-800"><h1 className="text-4xl font-bold">BARBER</h1><p className="text-sm text-gray-400">Admin Panel</p></div>
+        <div className="px-8 py-10 text-center">
+          <div className="w-32 h-32 mx-auto rounded-full border-4 border-orange-600 overflow-hidden shadow-xl"><img src={previewAvatar || user.avatar || defautAva} alt="avatar" className="w-full h-full object-cover" /></div>
+          <h2 className="mt-4 text-2xl font-bold">{user.username}</h2><p className="text-orange-500 font-medium">{user.role}</p>
+        </div>
+        <div className="p-6 border-t border-gray-800">
+          <button className="w-full py-3 bg-gray-800 hover:bg-gray-700 rounded-lg" onClick={() => { if (window.confirm("Bạn có chắc chắn muốn đăng xuất?")) { localStorage.removeItem("token"); window.location.href = "/login"; } }}>Đăng xuất</button>
+        </div>
+      </div>
+
+      <div className="flex-1 ml-72 p-10">
+        <div className="max-w-3xl mx-auto">
+          <h1 className="text-4xl font-bold mb-6">Xin chào, {user.username}!</h1>
+          <div className="bg-white rounded-2xl shadow-xl p-8">
+            <h3 className="text-2xl font-bold mb-6">Thông tin Admin</h3>
+            {!editing ? (
+              <>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-lg">
+                  <div><p className="text-gray-500">Tên đăng nhập</p><p className="font-bold">{user.username}</p></div>
+                  <div><p className="text-gray-500">Email</p><p className="font-bold">{user.email}</p></div>
+                  <div><p className="text-gray-500">Vai trò</p><p className="font-bold text-orange-600">{user.role}</p></div>
+                  <div><p className="text-gray-500">Số điện thoại</p><p className="font-bold">{user.phone || "Chưa có"}</p></div>
+                  <div><p className="text-gray-500">Địa chỉ</p><p className="font-bold">{user.address || "Chưa có"}</p></div>
+                </div>
+                <button onClick={() => setEditing(true)} className="w-full mt-8 py-3 bg-orange-600 hover:bg-orange-700 text-white font-bold rounded-xl">Chỉnh sửa thông tin cá nhân</button>
+              </>
+            ) : (
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div className="flex flex-col items-center gap-4">
+                  <div className="w-32 h-32 rounded-full border-4 border-orange-600 overflow-hidden shadow-xl"><img src={previewAvatar || formData.avatar || defautAva} alt="avatar preview" className="w-full h-full object-cover" /></div>
+                  <input type="file" id="avatarUpload" accept="image/*" onChange={handleAvatarChange} className="hidden" />
+                  <label htmlFor="avatarUpload" className="cursor-pointer px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700">Chọn ảnh đại diện</label>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <input type="text" name="username" value={formData.username} onChange={handleChange} className="border p-2 rounded" />
+                  <input type="email" name="email" value={formData.email} onChange={handleChange} className="border p-2 rounded" />
+                  <input type="text" name="phone" value={formData.phone} onChange={handleChange} placeholder="Số điện thoại" className="border p-2 rounded" />
+                  <input type="text" name="address" value={formData.address} onChange={handleChange} placeholder="Địa chỉ" className="border p-2 rounded" />
+                  <input type="text" name="role" value={formData.role} readOnly className="border p-2 rounded bg-gray-100" />
+                </div>
+                <div className="flex gap-3 mt-4">
+                  <button type="button" onClick={() => { setEditing(false); setPreviewAvatar(""); setFormData({ username: user.username, email: user.email, phone: user.phone || "", address: user.address || "", avatar: user.avatar || "", role: user.role || "" }); }} className="w-1/3 py-3 bg-gray-400 hover:bg-gray-500 text-white rounded-xl">Hủy</button>
+                  <button type="submit" className="w-2/3 py-3 bg-orange-600 hover:bg-orange-700 text-white font-bold rounded-xl">Lưu thay đổi</button>
+                </div>
+              </form>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default ProfileAdmin;

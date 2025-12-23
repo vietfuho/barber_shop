@@ -16,24 +16,27 @@ export default function AppoinManager() {
       .catch((err) => console.error("Lỗi lấy danh sách booking:", err));
   }, [token]);
 
-  // ❌ Xóa 1 booking
-   const handleCancel = async (id) => {
-    if (!window.confirm("Bạn có chắc muốn hủy lịch này?")) return;
+  //  Xóa 1 booking
+  const handleCancel = async (id) => {
+    if (!window.confirm("Bạn có chắc muốn xóa lịch này?")) return;
     try {
       await axios.delete(`http://localhost:5000/api/bookings/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      // Xóa lịch khỏi state
       setBookings((prev) => prev.filter((b) => b._id !== id));
-      alert("Hủy lịch hẹn thành công");
+      alert("Xóa lịch hẹn thành công");
     } catch (err) {
-      console.error("Lỗi hủy lịch:", err);
-      alert(err.response?.data?.error || "Hủy lịch thất bại");
+      console.error("Lỗi xóa lịch:", err);
+      alert(err.response?.data?.error || "xóa thất bại");
     }
   };
-  // 🔎 Bộ lọc tìm kiếm
-  const filteredBookings = bookings.filter((b) =>
-    b.fullName?.toLowerCase().includes(searchTerm.toLowerCase())
+
+  //  Bộ lọc tìm kiếm theo số điện thoại hoặc email
+  const filteredBookings = bookings.filter(
+    (b) =>
+      b.phone?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      b.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      b.serviceId?.name?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
@@ -46,7 +49,7 @@ export default function AppoinManager() {
       <div className="flex gap-3 items-center mb-4">
         <input
           type="text"
-          placeholder="Tìm kiếm"
+          placeholder="Tìm kiếm theo dịch vụ, số điện thoại, email"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           className="border border-gray-300 p-2 rounded w-64 focus:ring-2 focus:ring-orange-400"
@@ -64,7 +67,7 @@ export default function AppoinManager() {
         <thead className="bg-orange-500 text-white">
           <tr>
             <th className="px-4 py-2">STT</th>
-            <th className="px-4 py-2">Họ và tên</th>
+            <th className="px-4 py-2">Dịch vụ</th>
             <th className="px-4 py-2">Số điện thoại</th>
             <th className="px-4 py-2">Email</th>
             <th className="px-4 py-2">Ngày hẹn</th>
@@ -83,9 +86,9 @@ export default function AppoinManager() {
             </tr>
           ) : (
             filteredBookings.map((b, index) => (
-              <tr key={b._id || index} className="hover:bg-gray-100">
+              <tr key={b._id || index} className="hover:bg-gray-100 text-center">
                 <td className="border px-4 py-2">{index + 1}</td>
-                <td className="border px-4 py-2">{b.fullName || "-"}</td>
+                <td className="border px-4 py-2">{b.serviceId?.name || "-"}</td>
                 <td className="border px-4 py-2">{b.phone || "-"}</td>
                 <td className="border px-4 py-2">{b.email || "-"}</td>
                 <td className="border px-4 py-2">
@@ -95,13 +98,13 @@ export default function AppoinManager() {
                 <td className="border px-4 py-2">
                   {b.createdAt ? new Date(b.createdAt).toLocaleString() : "-"}
                 </td>
-                <td className="border px-4 py-2 text-center space-x-2">
+                <td className="border px-4 py-2 space-x-2">
                   <button
-                          onClick={() => handleCancel(b._id)}
-                          className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
-                        >
-                          xóa
-                        </button>
+                    onClick={() => handleCancel(b._id)}
+                    className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
+                  >
+                    Xóa
+                  </button>
                 </td>
               </tr>
             ))

@@ -95,3 +95,68 @@ exports.login = async (req, res) => {
     return res.status(500).json({ error: "Lỗi đăng nhập" });
   }
 };
+
+
+exports.changePassword = async (req, res) => {
+  try {
+    const userId = req.user.id; // từ verifyToken middleware
+    const { oldPassword, newPassword, confirmPassword } = req.body;
+
+    // 1️⃣ Validate input
+    if (!oldPassword || !newPassword || !confirmPassword) {
+      return res.status(400).json({
+        error: "Vui lòng nhập đầy đủ mật khẩu cũ, mật khẩu mới và xác nhận",
+      });
+    }
+
+    if (newPassword !== confirmPassword) {
+      return res.status(400).json({
+        error: "Mật khẩu xác nhận không khớp",
+      });
+    }
+
+    if (newPassword.length < 6) {
+      return res.status(400).json({
+        error: "Mật khẩu mới phải có ít nhất 6 ký tự",
+      });
+    }
+
+    // 2️⃣ Tìm user
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({
+        error: "Không tìm thấy người dùng",
+      });
+    }
+
+    // 3️⃣ Check mật khẩu cũ
+    const isMatch = await bcrypt.compare(oldPassword, user.password);
+    if (!isMatch) {
+      return res.status(400).json({
+        error: "Mật khẩu cũ không đúng",
+      });
+    }
+
+    // 4️⃣ Không cho trùng mật khẩu cũ
+    const isSameAsOld = await bcrypt.compare(newPassword, user.password);
+    if (isSameAsOld) {
+      return res.status(400).json({
+        error: "Mật khẩu mới không được trùng mật khẩu cũ",
+      });
+    }
+
+    // 5️⃣ Hash & lưu mật khẩu mới
+    const salt = await bcrypt.genSalt(10);
+    user.password = await bcrypt.hash(newPassword, salt);
+    await user.save();
+
+    res.json({
+      message: "✅ Đổi mật khẩu thành công",
+    });
+  } catch (error) {
+    console.error("changePassword error:", error);
+    res.status(500).json({
+      error: "Lỗi máy chủ",
+    });
+  }
+};

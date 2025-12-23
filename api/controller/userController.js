@@ -1,10 +1,27 @@
+const bcrypt = require("bcrypt");
 const User = require("../models/user");
-const staffRequest = require("../models/staffRequest")
+
 // Tạo user mới
 exports.create = async (req, res) => {
   try {
-    const user = await User.create(req.body);
-    res.status(201).json(user);
+    const { username, email, password, role, ...rest } = req.body;
+
+    if (!username || !email || !password) {
+      return res.status(400).json({ error: "Thiếu thông tin bắt buộc" });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const user = await User.create({
+      username,
+      email,
+      password: hashedPassword,
+      role: role && ["admin", "staff", "member"].includes(role) ? role : "member",
+      ...rest,
+    });
+
+    const { password: _, ...userData } = user.toObject();
+    res.status(201).json(userData);
   } catch (err) {
     res.status(500).json({ error: "Lỗi tạo user" });
   }
@@ -13,7 +30,7 @@ exports.create = async (req, res) => {
 // Lấy tất cả user
 exports.getAll = async (req, res) => {
   try {
-    const users = await User.find();
+    const users = await User.find().select("-password");
     res.json(users);
   } catch (err) {
     res.status(500).json({ error: "Lỗi lấy danh sách user" });
@@ -23,7 +40,8 @@ exports.getAll = async (req, res) => {
 // Lấy 1 user theo id
 exports.getOne = async (req, res) => {
   try {
-    const user = await User.findById(req.params.id);
+    const user = await User.findById(req.params.id).select("-password");
+    if (!user) return res.status(404).json({ error: "Không tìm thấy user" });
     res.json(user);
   } catch (err) {
     res.status(500).json({ error: "Lỗi lấy user" });
@@ -33,7 +51,13 @@ exports.getOne = async (req, res) => {
 // Cập nhật user
 exports.update = async (req, res) => {
   try {
-    const user = await User.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    const updateData = { ...req.body };
+    if (updateData.password) {
+      updateData.password = await bcrypt.hash(updateData.password, 10);
+    }
+
+    const user = await User.findByIdAndUpdate(req.params.id, updateData, { new: true }).select("-password");
+    if (!user) return res.status(404).json({ error: "Không tìm thấy user" });
     res.json(user);
   } catch (err) {
     res.status(500).json({ error: "Lỗi cập nhật user" });
@@ -43,50 +67,39 @@ exports.update = async (req, res) => {
 // Xóa user
 exports.remove = async (req, res) => {
   try {
-    await User.findByIdAndDelete(req.params.id);
+    const user = await User.findByIdAndDelete(req.params.id);
+    if (!user) return res.status(404).json({ error: "Không tìm thấy user" });
     res.json({ message: "Xóa user thành công" });
   } catch (err) {
     res.status(500).json({ error: "Lỗi xóa user" });
   }
 };
 
+// Lấy profile từ token
 exports.getProfile = async (req, res) => {
-    try {
-        const user = await User.findById(req.user.id).select("-password");
-        if (!user) {
-            return res.status(404).json({ message: "User not found" });
-        }
-        res.json(user);
-    } catch (err) {
-        res.status(500).json({ message: err.message });
+  try {
+    const user = await User.findById(req.user.id).select("-password");
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
     }
+    res.json(user);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
 };
 
-
-
-
-// lấy ra đội ngũ nhân viên 
+// Lấy đội ngũ nhân viên
 exports.getAllStaffs = async (req, res) => {
   try {
-    // Lấy danh sách user role = "staff"
-    const staffs = await User.find({ role: "staff" }).lean();
+    const staffs = await User.find({ role: "staff" })
+      .select("-password") // bỏ mật khẩu
+      .lean();
 
-    // Lấy toàn bộ staffRequest để join
-    const requests = await staffRequest.find().lean();
-
-    // JOIN thủ công
-    const result = staffs.map(staff => {
-      const req = requests.find(r => r.email === staff.email);
-
-      return {
-        ...staff,
-        specialty: req?.specialty || "Chưa cập nhật",
-        experience: req?.experience || 0
-      };
-    });
-
-    return res.json(result);
+    res.json(staffs);
   } catch (err) {
     return res.status(500).json({ error: err.message });
   }
 };
+
+
+

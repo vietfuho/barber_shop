@@ -1,12 +1,14 @@
 import { Link } from "react-router-dom";
 import backgroundHome from "../assets/image/backgroundHome.png";
-import { FaArrowRight } from "react-icons/fa6";
 import BookingButton from "./button/BookingButton";
+
 export default function HeroSection() {
+  // ❗ Trang home → CHƯA chọn dịch vụ
+  const hasSelectedService = false;
+
   return (
     <section className="relative min-h-[600px] flex items-center pt-20">
       <div className="absolute inset-0 z-0">
-        {/* Background image để trống */}
         <img
           src={backgroundHome}
           alt="Hero background"
@@ -18,7 +20,9 @@ export default function HeroSection() {
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 w-full">
         <div className="max-w-3xl text-white">
           <div className="inline-block px-4 py-2 bg-amber-500/20 border border-amber-500 rounded-full mb-6">
-            <Link to="premium" className="text-amber-500">Premium Barbershop</Link>
+            <Link to="/premium" className="text-amber-500">
+              Premium Barbershop
+            </Link>
           </div>
 
           <h1 className="text-5xl md:text-7xl mb-6">
@@ -33,8 +37,8 @@ export default function HeroSection() {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 mb-12">
-            {/* Nút Đặt lịch */}
-            <BookingButton/>
+            {/* ✅ Nút Đặt lịch (KHÔNG bọc onClick nữa) */}
+            <BookingButton hasSelectedService={hasSelectedService} />
 
             {/* Nút Xem dịch vụ */}
             <Link
@@ -47,25 +51,15 @@ export default function HeroSection() {
 
           <div className="grid grid-cols-3 gap-8 pt-8 border-t border-neutral-700">
             <div>
-              <div className="flex items-center gap-2 text-amber-500 mb-2">
-                {/* Icon để trống */}
-                <span className="w-6 h-6"></span>
-                <span className="text-3xl">5000+</span>
-              </div>
+              <span className="text-3xl text-amber-500">5000+</span>
               <p className="text-neutral-400">Khách hàng</p>
             </div>
             <div>
-              <div className="flex items-center gap-2 text-amber-500 mb-2">
-                <span className="w-6 h-6"></span>
-                <span className="text-3xl">10+</span>
-              </div>
+              <span className="text-3xl text-amber-500">10+</span>
               <p className="text-neutral-400">Năm kinh nghiệm</p>
             </div>
             <div>
-              <div className="flex items-center gap-2 text-amber-500 mb-2">
-                <span className="w-6 h-6"></span>
-                <span className="text-3xl">7/7</span>
-              </div>
+              <span className="text-3xl text-amber-500">7/7</span>
               <p className="text-neutral-400">Phục vụ cả tuần</p>
             </div>
           </div>

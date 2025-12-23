@@ -53,22 +53,22 @@ const DetailsServices = () => {
             </h1>
             <p className="text-gray-700 mb-6">{service.description}</p>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-gray-700 text-sm">
-              <div className="flex justify-between">
+            <div className=" grid-cols-1 sm:grid-cols-2 gap-4 text-gray-700 text-sm">
+              <div className="flex justify-between py-3">
                 <span className="font-semibold">Thời gian:</span>
                 <span>{service.duration || 0} phút</span>
               </div>
-              <div className="flex justify-between">
+              <div className="flex justify-between py-3">
                 <span className="font-semibold">Giá:</span>
                 <span className="text-orange-600 font-bold">
                   {(service.price || 0).toLocaleString()} VNĐ
                 </span>
               </div>
-              <div className="flex justify-between">
+              <div className="flex justify-between py-3">
                 <span className="font-semibold">Kiểu tóc:</span>
                 <span>{service.styleOptions || "Không có"}</span>
               </div>
-              <div className="flex justify-between">
+              <div className="flex justify-between py-3">
                 <span className="font-semibold">Trạng thái:</span>
                 <span className={service.isActive ? "text-green-600 font-semibold" : "text-red-500 font-semibold"}>
                   {service.isActive ? "Đang hoạt động" : "Ngừng hoạt động"}

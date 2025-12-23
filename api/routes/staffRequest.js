@@ -1,14 +1,15 @@
 const express = require("express");
 const router = express.Router();
-const staffRequestControl = require("../controller/request");
-const checkrole = require("../middleware/checkrole");
-const verify = require("../middleware/verifyToken")
+const staffRequestController = require("../controller/request");
+const checkRole = require("../middleware/checkrole");
+const verifyToken = require("../middleware/verifyToken");
 
-// Ai cũng có thể đăng ký
-
-router.post("/request", verify, checkrole("member"), staffRequestControl.createRequest);
-
-
-
+// Member gửi yêu cầu trở thành staff
+router.post(
+  "/request",
+  verifyToken,
+  checkRole("member"),
+  staffRequestController.createRequest
+);
 
 module.exports = router;

@@ -10,6 +10,7 @@ import Dashboard from "../../pages/admin/Dashboard";
 import UserMana from "../../pages/admin/UserMana";
 import AppoinManager from "../../pages/admin/ApppoinManager";
 import Aprove from "../../pages/admin/Aprove";
+import ProfileAdmin from "../../pages/admin/ProfileAdmin";
 
 const AdminFE = () => {
   return (
@@ -33,7 +34,7 @@ const AdminFE = () => {
             <Route path="users" element={<UserMana />} />
             <Route path="bookings" element={<AppoinManager />} />
             <Route path="aprove" element={<Aprove />} />
-            
+            <Route path="profileAdmin" element={<ProfileAdmin />} />  
           </Routes>
         </main>
       </div>

@@ -1,15 +1,15 @@
 const mongoose = require("mongoose");
 
 const serviceSchema = new mongoose.Schema({
-  name: { type: String, required: true }, // Tên dịch vụ
+  name: { type: String, required: true }, 
 
-  // Kiểu tóc: mảng chuỗi tự nhập
-  styleOptions: { type: String },       // Ví dụ: ["Undercut", "Layer", "Fade"]
+  // Kiểu tóc: mảng chuỗi
+  styleOptions: [{ type: String,required: true}],       
 
   // Màu nhuộm: mảng object
   colorOptions: [
     {
-      label: String,   // Tên màu: "Xám khói"
+      label: String,   // Tên màu
       swatch: String   // Mã màu hoặc link ảnh
     }
   ],
@@ -23,4 +23,4 @@ const serviceSchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now }
 });
 
-module.exports = mongoose.model("Service", serviceSchema,"services");
+module.exports = mongoose.model("Service", serviceSchema, "services");

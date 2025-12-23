@@ -1,16 +1,42 @@
-// src/components/BookingButton.jsx
 import React from "react";
-import { Link } from "react-router-dom";
-import { FaArrowRight } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 
-export default function BookingButton() {
+const BookingButton = ({ hasSelectedService = false }) => {
+  const navigate = useNavigate();
+
+  const handleClick = () => {
+    const token = localStorage.getItem("token");
+
+    // ❌ Chưa đăng nhập
+    if (!token) {
+      const confirmLogin = window.confirm(
+        "⚠️ Bạn cần đăng nhập trước khi đặt lịch. Nhấn OK để chuyển đến trang đăng nhập."
+      );
+      if (confirmLogin) navigate("/login");
+      return;
+    }
+
+    // ❌ Chưa chọn dịch vụ
+    if (!hasSelectedService) {
+      const confirmService = window.confirm(
+        "⚠️ Bạn cần chọn dịch vụ trước khi đặt lịch. Nhấn OK để chuyển đến trang dịch vụ."
+      );
+      if (confirmService) navigate("/services");
+      return;
+    }
+
+    // ✅ Đủ điều kiện
+    navigate("/booking");
+  };
+
   return (
-    <Link
-              to="/booking"
-              className="flex items-center justify-center gap-2 bg-amber-500 hover:bg-amber-600 text-white px-6 py-3 rounded-full text-base font-semibold transition"
-            >
-              Đặt lịch ngay
-              <FaArrowRight className="text-white text-lg" />
-            </Link>
+    <button
+      onClick={handleClick}
+      className="flex items-center justify-center gap-2 bg-orange-600 hover:bg-amber-600 text-white px-11 py-5 rounded-full text-base font-semibold transition"
+    >
+      Đặt lịch
+    </button>
   );
-}
+};
+
+export default BookingButton;
