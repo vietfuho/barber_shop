@@ -1,11 +1,10 @@
 const mongoose = require("mongoose");
 
-const chatbotSchema = new mongoose.Schema({
-  intent: { type: String, required: true }, // ví dụ: "đặt lịch", "giá dịch vụ"
-  question: { type: String, required: true },
-  answer: { type: String, required: true },
-  tags: [String], // từ khóa liên quan
+const messageSchema = new mongoose.Schema({
+  senderId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+  receiverId: { type: mongoose.Schema.Types.ObjectId, ref: "User" }, // admin/staff
+  content: { type: String, required: true },
   createdAt: { type: Date, default: Date.now }
 });
 
-module.exports = mongoose.model("ChatbotData", chatbotSchema);
+module.exports = mongoose.model("Message", messageSchema);

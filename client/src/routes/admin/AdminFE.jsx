@@ -11,6 +11,8 @@ import UserMana from "../../pages/admin/UserMana";
 import AppoinManager from "../../pages/admin/ApppoinManager";
 import Aprove from "../../pages/admin/Aprove";
 import ProfileAdmin from "../../pages/admin/ProfileAdmin";
+import AdminSchedules from "../../pages/admin/AdminSchedules";
+import ChatAdmin from "../../pages/admin/ChatAdmin";
 
 const AdminFE = () => {
   return (
@@ -35,8 +37,10 @@ const AdminFE = () => {
             <Route path="bookings" element={<AppoinManager />} />
             <Route path="aprove" element={<Aprove />} />
             <Route path="profileAdmin" element={<ProfileAdmin />} />  
+            <Route path="postSchedule" element={<AdminSchedules />} />  
           </Routes>
         </main>
+           <ChatAdmin />
       </div>
     </div>
   );

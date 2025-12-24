@@ -11,6 +11,7 @@ import ServicesPrice from "./pages/Services&Pricing";
 import Gallery from "./pages/Gallery";
 import LoginForm from "./Components/LoginForm";
 import RegisterForm from "./Components/RegisterForm";
+import StaffSchedules from "./pages/StaffSchedules";
 
 import AdminFE from "./routes/admin/AdminFE";
 import DetailsFe from "./pages/DetailsFE";
@@ -24,6 +25,8 @@ import EditAppoin from "./Components/Admin/EditAppoin";
 import Chatbot from "./pages/Chatbot";
 import BookingForm from "./Components/BookingForm";
 import ResetPass from "./pages/ResetPass";
+
+
 
 function App() {
   // Khởi tạo trạng thái đăng nhập từ localStorage để giữ sau F5
@@ -66,8 +69,11 @@ function App() {
           />
           <Route path="/register" element={<RegisterForm />} />
 
-          {/* Member routes */}
+          {/* lịch của người dùng  */}
           <Route path="/mybookings" element={<MyBookings />} />
+          
+          {/* lịch làm việc của nhân viên */}
+         <Route path="/StaffSchedule" element={<StaffSchedules />} />
 
           {/* Admin routes */}
           <Route path="/admin/*" element={<AdminFE />} />

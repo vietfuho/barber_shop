@@ -1,7 +1,7 @@
 const Message = require("../models/chatbot");
 
-// Admin/Staff gửi tin nhắn cho member
-exports.sendMessageToMember = async (req, res) => {
+// Member gửi tin nhắn cho admin/staff
+exports.sendMessageToAdmin = async (req, res) => {
   try {
     const { receiverId, content } = req.body;
     const msg = await Message.create({
@@ -9,21 +9,24 @@ exports.sendMessageToMember = async (req, res) => {
       receiverId,
       content
     });
-    // thêm phản hồi cho khách
+    // thêm lời chào mặc định cho member
     res.json({
       ...msg.toObject(),
-      botReply: "Tin nhắn của bạn đã được gửi tới khách hàng."
+      botReply: "Xin chào! Tôi có thể giúp gì cho bạn?"
     });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 };
 
-// Admin/Staff lấy tin nhắn từ member
-exports.getMessagesForAdmin = async (req, res) => {
+// Member lấy tin nhắn (bao gồm cả phản hồi từ admin/staff)
+exports.getMessagesForMember = async (req, res) => {
   try {
-    const msgs = await Message.find({ receiverId: req.user.id })
+    const msgs = await Message.find({
+      $or: [{ senderId: req.user.id }, { receiverId: req.user.id }]
+    })
       .populate("senderId", "username role")
+      .populate("receiverId", "username role")
       .sort({ createdAt: 1 });
 
     res.json(msgs);

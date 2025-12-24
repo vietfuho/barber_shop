@@ -12,6 +12,6 @@ module.exports = (app) => {
   app.use("/api/admin", admin_routes);
   app.use("/api/services", serviceRoutes);
   app.use("/api/bookings", bookingRoutes);
-  app.use("/api/chatbot", chatbotRoutes);
+  app.use("/api/messages", chatbotRoutes);
   app.use("/api/staff", staffRequestRoutes);
 };

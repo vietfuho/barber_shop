@@ -2,35 +2,27 @@ import React, { useState, useEffect } from "react";
 import { RiChatVoiceAiFill } from "react-icons/ri";
 import axios from "axios";
 
-function Chatbot() {
+function ChatAdmin() {
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
 
   const token = localStorage.getItem("token");
   const userId = localStorage.getItem("userId");
-  const adminId = localStorage.getItem("adminId"); // id của admin/staff
+  const memberId = localStorage.getItem("memberId"); // id của member cần chat
 
-  // Khi mở popup thì load tin nhắn từ API dành cho member
+  // Khi mở popup thì load tin nhắn từ API dành cho admin
   useEffect(() => {
     if (open) {
-      axios.get("http://localhost:5000/api/member/messages/getformember", {
+      axios.get("http://localhost:5000/api/admin/messages/getforadmin", {
         headers: { Authorization: `Bearer ${token}` }
       })
-        .then(res => {
-          let initialMsgs = res.data;
-          if (initialMsgs.length === 0) {
-            initialMsgs = [
-              { sender: "bot", content: "Xin chào! Tôi có thể giúp gì cho bạn?" }
-            ];
-          }
-          setMessages(initialMsgs);
-        })
+        .then(res => setMessages(res.data))
         .catch(err => console.error("Lỗi lấy tin nhắn:", err));
     }
   }, [open, token]);
 
-  // Member gửi tin nhắn tới admin
+  // Admin gửi tin nhắn tới member
   const handleSend = async () => {
     if (!input.trim()) return;
 
@@ -38,8 +30,8 @@ function Chatbot() {
     setMessages(newMessages);
 
     try {
-      const res = await axios.post("http://localhost:5000/api/member/messages/sendtoadmin",
-        { receiverId: adminId, content: input },
+      const res = await axios.post("http://localhost:5000/api/admin/messages/sendtomember",
+        { receiverId: memberId, content: input },
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setMessages([...newMessages, res.data]);
@@ -62,7 +54,7 @@ function Chatbot() {
       {open && (
         <div className="mt-2 w-80 h-96 bg-white shadow-xl rounded-lg flex flex-col">
           <div className="bg-blue-600 text-white p-2 rounded-t-lg flex justify-between items-center">
-            <span>Chat với Admin</span>
+            <span>Chat với Member</span>
             <button onClick={() => setOpen(false)} className="text-sm">✕</button>
           </div>
 
@@ -103,4 +95,4 @@ function Chatbot() {
   );
 }
 
-export default Chatbot;
+export default ChatAdmin;

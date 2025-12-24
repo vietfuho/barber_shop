@@ -1,15 +1,13 @@
 const express = require("express");
 const router = express.Router();
-const chatbotController = require("../controller/chatbotController");
 const verifyToken = require("../middleware/verifyToken");
-// CRUD cho ChatbotData
-// Khách hàng có thể hỏi chatbot mà không cần đăng nhập
-router.get("/", chatbotController.getAll);
-router.get("/:id", chatbotController.getOne);
+const memberController = require("../controller/ChatbotMember");
+const chatbotcontroller = require("../controller/chatbotController.js");
 
-// Quản lý dữ liệu chatbot → chỉ admin (sau này thêm checkRole)
-router.post("/", verifyToken, chatbotController.create);
-router.put("/:id", verifyToken, chatbotController.update);
-router.delete("/:id", verifyToken, chatbotController.remove);
-router.post("/ask", verifyToken,chatbotController.ask)
+router.post("/sendtoadmin", verifyToken, memberController.sendMessageToAdmin);
+router.get("/getformember", verifyToken, memberController.getMessagesForMember);
+
+router.post("/sendtomember", verifyToken, chatbotcontroller.sendMessageToMember);
+router.get("/getforadmin", verifyToken, chatbotcontroller.getMessagesForAdmin);
+
 module.exports = router;

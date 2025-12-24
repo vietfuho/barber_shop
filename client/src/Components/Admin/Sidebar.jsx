@@ -7,7 +7,9 @@
       { to: "/admin/users", label: "Người dùng" },
       { to: "/admin/services", label: "Dịch vụ" },
       { to: "/admin/bookings", label: "Lịch hẹn" },
+      { to: "/admin/postSchedule", label: "Lịch làm việc" },
       { to: "/admin/aprove", label: "Phê duyệt yêu cầu" },
+      
     ];
 
     return (

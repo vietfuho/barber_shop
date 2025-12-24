@@ -18,6 +18,6 @@ router.get("/:id", verifyToken, checkRole(["member", "staff", "admin"]), booking
 router.put("/:id", verifyToken, checkRole("member"), bookingController.update);
 
 // Hủy lịch hẹn → member (chính chủ) hoặc admin
-router.delete("/:id", verifyToken, checkRole(["member","admin"]), bookingController.remove);
+router.delete("/:id", verifyToken, checkRole(["member","staff","admin"]), bookingController.remove);
 
 module.exports = router;

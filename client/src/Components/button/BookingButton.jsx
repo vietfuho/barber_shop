@@ -3,11 +3,8 @@ import { useNavigate } from "react-router-dom";
 
 const BookingButton = ({ hasSelectedService = false }) => {
   const navigate = useNavigate();
-
   const handleClick = () => {
     const token = localStorage.getItem("token");
-
-    // ❌ Chưa đăng nhập
     if (!token) {
       const confirmLogin = window.confirm(
         "⚠️ Bạn cần đăng nhập trước khi đặt lịch. Nhấn OK để chuyển đến trang đăng nhập."
@@ -15,20 +12,15 @@ const BookingButton = ({ hasSelectedService = false }) => {
       if (confirmLogin) navigate("/login");
       return;
     }
-
-    // ❌ Chưa chọn dịch vụ
     if (!hasSelectedService) {
       const confirmService = window.confirm(
-        "⚠️ Bạn cần chọn dịch vụ trước khi đặt lịch. Nhấn OK để chuyển đến trang dịch vụ."
+        " Bạn cần chọn dịch vụ trước khi đặt lịch. Nhấn OK để chuyển đến trang dịch vụ."
       );
       if (confirmService) navigate("/services");
       return;
     }
-
-    // ✅ Đủ điều kiện
     navigate("/booking");
   };
-
   return (
     <button
       onClick={handleClick}
