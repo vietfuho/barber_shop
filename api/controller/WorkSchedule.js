@@ -1,28 +1,28 @@
 const WorkSchedule = require("../models/WorkSchedule");
 const User = require("../models/user");
 
-// Admin tạo lịch làm việc cho staff
+// Admin tạo lịch cho staff bằng username
 exports.createWorkSchedule = async (req, res) => {
   try {
-    const { staffId, date, shift, note } = req.body;
+    const { username, date, shift, note } = req.body;
 
-    // Kiểm tra staff có tồn tại không
-    const staff = await User.findById(staffId);
-    if (!staff || staff.role !== "staff") {
+    // Tìm nhân viên theo username
+    const staff = await User.findOne({ username, role: "staff" });
+    if (!staff) {
       return res.status(400).json({ message: "Không tìm thấy nhân viên hợp lệ" });
     }
 
-    // ❌ Check ngày không được là quá khứ
+    // Check ngày không được là quá khứ
     const today = new Date();
-    today.setHours(0, 0, 0, 0); // reset về 00:00
+    today.setHours(0, 0, 0, 0);
     const scheduleDate = new Date(date);
     if (scheduleDate < today) {
       return res.status(400).json({ message: "Không thể tạo lịch cho ngày đã qua" });
     }
 
-    // ❌ Check trùng ca trong cùng ngày
+    // Check trùng ca trong cùng ngày
     const existing = await WorkSchedule.findOne({
-      staffId,
+      staffId: staff._id,
       date: scheduleDate,
       shift
     });
@@ -30,8 +30,9 @@ exports.createWorkSchedule = async (req, res) => {
       return res.status(400).json({ message: "Nhân viên này đã có lịch trong ca đó" });
     }
 
+    // Tạo mới
     const newSchedule = new WorkSchedule({
-      staffId,
+      staffId: staff._id,
       date: scheduleDate,
       shift,
       note,
@@ -39,21 +40,21 @@ exports.createWorkSchedule = async (req, res) => {
     });
 
     await newSchedule.save();
-
-    res.status(201).json({ message: "Tạo lịch làm việc thành công", schedule: newSchedule });
-  } catch (error) {
-    res.status(500).json({ error: error.message || "Lỗi máy chủ" });
+    res.status(201).json({ message: "Tạo lịch thành công", schedule: newSchedule });
+  } catch (err) {
+    res.status(500).json({ message: "Lỗi server", error: err.message });
   }
 };
-// Admin xem lịch làm việc của tất cả staff
+
 // Admin xem tất cả lịch
 exports.getAllSchedules = async (req, res) => {
   try {
     const schedules = await WorkSchedule.find()
-      .populate("staffId", "username email"); // lấy tên và email nhân viên
+      .populate("staffId", "username")
+      .populate("createdBy", "username");
     res.json(schedules);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
+  } catch (err) {
+    res.status(500).json({ message: "Lỗi server", error: err.message });
   }
 };
 
@@ -61,9 +62,9 @@ exports.getAllSchedules = async (req, res) => {
 exports.getMySchedule = async (req, res) => {
   try {
     const schedules = await WorkSchedule.find({ staffId: req.user.id })
-      .populate("staffId", "username email"); // lấy tên và email nhân viên
+      .populate("staffId", "username");
     res.json(schedules);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
+  } catch (err) {
+    res.status(500).json({ message: "Lỗi server", error: err.message });
   }
 };

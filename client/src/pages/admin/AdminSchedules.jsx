@@ -5,7 +5,7 @@ const AdminWeeklySchedule = () => {
   const [schedules, setSchedules] = useState([]);
   const [weekStart, setWeekStart] = useState(getMonday(new Date()));
   const [showForm, setShowForm] = useState(false);
-  const [formData, setFormData] = useState({ staffId: "", date: "", shift: "morning" });
+  const [formData, setFormData] = useState({ username: "", date: "", shift: "morning" });
   const token = localStorage.getItem("token");
 
   // Lấy ngày thứ 2 đầu tuần
@@ -49,7 +49,7 @@ const AdminWeeklySchedule = () => {
       });
       alert("✅ Tạo lịch thành công");
       setShowForm(false);
-      setFormData({ staffId: "", date: "", shift: "morning" });
+      setFormData({ username: "", date: "", shift: "morning" });
       const res = await axios.get("http://localhost:5000/api/admin/schedules", {
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -92,10 +92,10 @@ const AdminWeeklySchedule = () => {
         {showForm && (
           <form onSubmit={handleSubmit} className="space-y-4 border p-6 rounded-lg bg-gray-50 mb-8">
             <input
-              name="staffId"
-              value={formData.staffId}
-              onChange={e => setFormData({ ...formData, staffId: e.target.value })}
-              placeholder="ID nhân viên"
+              name="username"
+              value={formData.username}
+              onChange={e => setFormData({ ...formData, username: e.target.value })}
+              placeholder="Username nhân viên"
               required
               className="w-full border px-3 py-2 rounded-lg"
             />
@@ -153,7 +153,11 @@ const AdminWeeklySchedule = () => {
                   const list = getSchedulesForDayShift(d, shift.key);
                   return (
                     <td key={i} className="border px-4 py-2 text-sm">
-                      {list.length === 0 ? <span className="text-gray-400 italic">-</span> : list.map(s => <div key={s._id}>{s.staffId?.username}</div>)}
+                      {list.length === 0 ? (
+                        <span className="text-gray-400 italic">-</span>
+                      ) : (
+                        list.map(s => <div key={s._id}>{s.staffId?.username}</div>)
+                      )}
                     </td>
                   );
                 })}
