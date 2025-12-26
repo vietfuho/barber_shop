@@ -8,46 +8,69 @@ function Chatbot() {
   const [input, setInput] = useState("");
 
   const token = localStorage.getItem("token");
-  const userId = localStorage.getItem("userId");
-  const adminId = localStorage.getItem("adminId"); // id của admin/staff
+  const adminId = localStorage.getItem("adminId"); // nếu null → dùng AI
 
-  // Khi mở popup thì load tin nhắn từ API dành cho member
+  /* ======================
+     LOAD MESSAGE KHI MỞ
+  ====================== */
   useEffect(() => {
     if (open) {
-      axios.get("http://localhost:5000/api/member/messages/getformember", {
-        headers: { Authorization: `Bearer ${token}` }
-      })
-        .then(res => {
-          let initialMsgs = res.data;
-          if (initialMsgs.length === 0) {
-            initialMsgs = [
-              { sender: "bot", content: "Xin chào! Tôi có thể giúp gì cho bạn?" }
-            ];
-          }
-          setMessages(initialMsgs);
-        })
-        .catch(err => console.error("Lỗi lấy tin nhắn:", err));
+      setMessages([
+        { sender: "bot", content: "👋 Xin chào! Tôi có thể giúp gì cho bạn?" }
+      ]);
     }
-  }, [open, token]);
+  }, [open]);
 
-  // Member gửi tin nhắn tới admin
+  /* ======================
+     SEND MESSAGE
+  ====================== */
   const handleSend = async () => {
     if (!input.trim()) return;
 
-    const newMessages = [...messages, { senderId: userId, content: input }];
-    setMessages(newMessages);
+    const userMsg = { sender: "user", content: input };
+    setMessages((prev) => [...prev, userMsg]);
+    setInput("");
 
-    try {
-      const res = await axios.post("http://localhost:5000/api/member/messages/sendtoadmin",
-        { receiverId: adminId, content: input },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      setMessages([...newMessages, res.data]);
-    } catch (err) {
-      console.error("Lỗi gửi tin nhắn:", err);
+    /* ======================
+       CASE 1: CÓ ADMIN
+    ====================== */
+    if (adminId) {
+      try {
+        const res = await axios.post(
+          "http://localhost:5000/api/member/messages/sendtoadmin",
+          { receiverId: adminId, content: input },
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+
+        setMessages((prev) => [...prev, res.data]);
+      } catch (err) {
+        console.error("Lỗi gửi admin:", err);
+      }
+      return;
     }
 
-    setInput("");
+    /* ======================
+       CASE 2: KHÔNG CÓ ADMIN → AI
+    ====================== */
+    try {
+      // call local FAQ-based AI endpoint
+      const res = await axios.post("http://localhost:5000/api/ai/faq", {
+        question: input
+      });
+
+      const aiAnswer =
+        Array.isArray(res.data) && res.data.length > 0
+          ? res.data[0].answer
+          : "Xin lỗi, tôi chưa hiểu câu hỏi.";
+
+      setMessages((prev) => [...prev, { sender: "bot", content: aiAnswer }]);
+    } catch (err) {
+      console.error("Lỗi AI:", err);
+      setMessages((prev) => [
+        ...prev,
+        { sender: "bot", content: "⚠️ AI đang bận, vui lòng thử lại sau." }
+      ]);
+    }
   };
 
   return (
@@ -62,16 +85,16 @@ function Chatbot() {
       {open && (
         <div className="mt-2 w-80 h-96 bg-white shadow-xl rounded-lg flex flex-col">
           <div className="bg-blue-600 text-white p-2 rounded-t-lg flex justify-between items-center">
-            <span>Chat với Admin</span>
-            <button onClick={() => setOpen(false)} className="text-sm">✕</button>
+            <span>🤖 Trợ lý AI</span>
+            <button onClick={() => setOpen(false)}>✕</button>
           </div>
 
           <div className="flex-1 p-2 overflow-y-auto space-y-2">
             {messages.map((msg, i) => (
               <div
                 key={i}
-                className={`p-2 rounded-lg max-w-[70%] ${
-                  msg.senderId === userId
+                className={`p-2 rounded-lg max-w-[75%] ${
+                  msg.sender === "user"
                     ? "bg-blue-500 text-white ml-auto"
                     : "bg-gray-200 text-gray-800"
                 }`}
@@ -83,16 +106,15 @@ function Chatbot() {
 
           <div className="p-2 border-t flex">
             <input
-              type="text"
               value={input}
               onChange={(e) => setInput(e.target.value)}
               placeholder="Nhập tin nhắn..."
-              className="flex-1 border rounded px-2 py-1 text-sm focus:outline-none"
+              className="flex-1 border rounded px-2 py-1 text-sm"
               onKeyDown={(e) => e.key === "Enter" && handleSend()}
             />
             <button
               onClick={handleSend}
-              className="ml-2 bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700"
+              className="ml-2 bg-blue-600 text-white px-3 py-1 rounded"
             >
               Gửi
             </button>

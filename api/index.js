@@ -2,79 +2,90 @@ const express = require("express");
 require("dotenv").config();
 const cors = require("cors");
 const connectDB = require("./config/ConnectDB.js");
-const http = require("http");
-const { Server } = require("socket.io");
+const { GoogleGenerativeAI } = require("@google/generative-ai");
 
 const app = express();
 const port = process.env.PORT || 5000;
 
-// connect to database
-connectDB();
+/* =======================
+   KẾT NỐI DATABASE
+======================= */
+connectDB(process.env.MONGODB_URL);
 
-// middleware
+/* =======================
+   MIDDLEWARE
+======================= */
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors());
-
-// ✅ Cho phép truy cập ảnh trong thư mục uploads
 app.use("/uploads", express.static("uploads"));
 
-// import routes tổng
-const route = require("./routes/index_routes.js");
-route(app);
+/* =======================
+   KHỞI TẠO GEMINI AI
+   ⚠️ model PHẢI có "models/"
+======================= */
+const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY);
 
-// tạo server http
-const server = http.createServer(app);
+const model = genAI.getGenerativeModel({
+  model: "models/gemini-1.5-flash"
+});
 
-// khởi tạo socket.io
-const io = new Server(server, {
-  cors: {
-    origin: "http://localhost:3000", // FE React
-    methods: ["GET", "POST"]
+/* =======================
+   API AI SEARCH
+======================= */
+app.post("/api/ai/search", async (req, res) => {
+  try {
+    const { question } = req.body;
+
+    if (!question) {
+      return res.status(400).json({ error: "question is required" });
+    }
+
+    const prompt = `
+Bạn là một trợ lý thông minh giúp tư vấn khách hàng cho website.
+
+Câu hỏi của khách hàng:
+"${question}"
+
+Hãy trả lời dưới dạng JSON ARRAY, mỗi phần tử là object:
+[
+  { "answer": "..." }
+]
+
+CHỈ trả về JSON, KHÔNG markdown, KHÔNG giải thích.
+`;
+
+    const result = await model.generateContent(prompt);
+
+    let text = result.response.text().trim();
+
+    // loại bỏ ```json nếu Gemini tự thêm
+    text = text.replace(/```json|```/g, "");
+
+    const data = JSON.parse(text);
+
+    return res.status(200).json(data);
+
+  } catch (error) {
+    console.error("❌ AI ERROR:", error.message);
+    return res.status(500).json({
+      error: "AI processing failed",
+      detail: error.message
+    });
   }
 });
 
-// lắng nghe kết nối socket
-io.on("connection", (socket) => {
-  console.log("User connected:", socket.id);
+/* =======================
+   ROUTES KHÁC (NẾU CÓ)
+======================= */
+const route = require("./routes/index_routes.js");
+route(app);
 
-  // join theo userId và role
-  socket.on("join", ({ userId, role }) => {
-    socket.join(userId);
-    socket.data.userId = userId;
-    socket.data.role = role; // lưu role vào socket
-    console.log(`User ${userId} (${role}) joined room`);
-  });
-
-  // nhận tin nhắn từ client
-  socket.on("sendMessage", ({ senderId, receiverId, content }) => {
-    const msg = { senderId, receiverId, content, createdAt: new Date() };
-    const senderRole = socket.data.role;
-
-    if (senderRole === "member") {
-      // member gửi → phát tới tất cả admin/staff
-      for (const [id, s] of io.sockets.sockets) {
-        if (s.data.role === "admin" || s.data.role === "staff") {
-          io.to(s.id).emit("newMessage", msg);
-        }
-      }
-    } else if (senderRole === "admin" || senderRole === "staff") {
-      // admin/staff gửi → chỉ gửi tới member cụ thể
-      io.to(receiverId).emit("newMessage", msg);
-    }
-
-    // gửi lại cho người gửi để hiển thị
-    io.to(senderId).emit("newMessage", msg);
-  });
-
-  socket.on("disconnect", () => {
-    console.log("User disconnected:", socket.id);
-  });
-});
-
-// listen port
-server.listen(port, () => {
-  console.log(`App + Socket.IO listening on port ${port}`);
+/* =======================
+   START SERVER
+======================= */
+app.listen(port, () => {
+  console.log(`✅ Server listening on http://localhost:${port}`);
 });
 
 module.exports = app;

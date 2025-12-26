@@ -1,0 +1,89 @@
+[
+  {
+    "id": "opening_hours",
+    "question_variants": [
+      "mấy giờ mở cửa",
+      "giờ mở cửa",
+      "open hours",
+      "mở cửa"
+    ],
+    "answer": "Salon mở cửa từ 08:00 đến 20:00 mỗi ngày."
+  },
+  {
+    "id": "closing_time",
+    "question_variants": [
+      "mấy giờ đóng cửa",
+      "giờ đóng cửa",
+      "closing time",
+      "đóng cửa"
+    ],
+    "answer": "Chúng tôi đóng cửa lúc 20:00 mỗi ngày."
+  },
+  {
+    "id": "prices_haircut",
+    "question_variants": [
+      "giá cắt tóc",
+      "bao nhiêu tiền cắt tóc",
+      "haircut price",
+      "price haircut"
+    ],
+    "answer": "Giá cắt tóc nam cơ bản: 150.000 VND. Cắt tạo kiểu từ 200.000 VND.",
+    "details": {
+      "basic_haircut": 150000,
+      "style_haircut": 200000
+    }
+  },
+  {
+    "id": "service_prices",
+    "question_variants": [
+      "giá dịch vụ",
+      "bảng giá",
+      "service prices",
+      "price list"
+    ],
+    "answer": "Bảng giá cơ bản: Cắt tóc: 150k, Nhuộm tóc: từ 400k, Gội + massage: 80k. Liên hệ để biết giá chi tiết cho dịch vụ đặc biệt.",
+    "services": [
+      {"name": "Cắt tóc", "price_vnd": 150000},
+      {"name": "Nhuộm tóc (bắt đầu)", "price_vnd": 400000},
+      {"name": "Gội + massage", "price_vnd": 80000}
+    ]
+  },
+  {
+    "id": "booking_info",
+    "question_variants": [
+      "đặt lịch",
+      "làm sao để đặt lịch",
+      "booking",
+      "how to book"
+    ],
+    "answer": "Bạn có thể đặt lịch qua website tại trang 'Booking' hoặc gọi số hotline: 0123-456-789."
+  },
+  {
+    "id": "payment_methods",
+    "question_variants": [
+      "thanh toán",
+      "phương thức thanh toán",
+      "payment methods"
+    ],
+    "answer": "Chúng tôi chấp nhận tiền mặt, thẻ ngân hàng và chuyển khoản."
+  },
+  {
+    "id": "location",
+    "question_variants": [
+      "địa chỉ",
+      "ở đâu",
+      "where are you",
+      "location"
+    ],
+    "answer": "Salon nằm tại 123 Đường Tóc Đẹp, Quận A, Thành phố B."
+  },
+  {
+    "id": "staff_availability",
+    "question_variants": [
+      "có thợ không",
+      "nhân viên",
+      "staff availability"
+    ],
+    "answer": "Vui lòng kiểm tra trang 'Staff Schedules' để biết lịch làm việc của nhân viên hoặc liên hệ hotline để hỗ trợ."
+  }
+]
